@@ -1334,7 +1334,9 @@ def demo_pw_users():
 
 
 def main():
-    host = os.environ.get("P1_HOST") or ("0.0.0.0" if PROD else "127.0.0.1")
+    # Codespaces / 容器里必须绑 0.0.0.0，否则端口代理进不来（表现为"已重置连接"）
+    in_cloud = bool(os.environ.get("CODESPACE_NAME") or os.environ.get("CONTAINER_HOST"))
+    host = os.environ.get("P1_HOST") or ("0.0.0.0" if (PROD or in_cloud) else "127.0.0.1")
     port = int(os.environ.get("P1_PORT") or 8765)
     for i, a in enumerate(sys.argv):
         if a == "--port" and i + 1 < len(sys.argv):
