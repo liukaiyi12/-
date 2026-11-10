@@ -10,13 +10,24 @@ export PYTHONIOENCODING=utf-8
 
 echo "---------------------------------------------"
 echo " 新平食品 P1"
-echo " 数据目录：${P1_DATA:-$(pwd)/_work}"
+echo " 目录：$(pwd)"
 echo " 端口：$P1_PORT"
 echo "---------------------------------------------"
-echo " 打开方式："
-echo "   1) 在「端口」面板找到 $P1_PORT，右键 → 端口可见性 → 公开"
-echo "   2) 复制那串 https://xxx-8765.app.github.dev 的地址，发给别人就能打开"
+
+# postCreateCommand 有时会静默失败，这里再兜一次底。
+# 没装 openpyxl 的话，07_p1_server.py 一 import 就崩，现象是"端口没人监听"。
+if ! python -c "import openpyxl" >/dev/null 2>&1; then
+  echo "[deps] 正在安装 openpyxl ..."
+  python -m pip install -q openpyxl==3.1.5 || true
+fi
+python -c "import openpyxl; print('[deps] openpyxl', openpyxl.__version__)" 2>/dev/null \
+  || echo "[deps] 警告：openpyxl 仍然没装上，商品目录表可能读不了"
+
+echo "[p1] 启动中，日志同时写到 /tmp/p1.log"
+echo "---------------------------------------------"
+echo " 打开方式：下方「端口」面板 → 8765 → 右键 → 端口可见性 → 公开"
 echo " 演示账号：boss / demo1234"
 echo "---------------------------------------------"
 
-exec python 07_p1_server.py
+# tee 一份日志，出错时不用翻终端历史
+exec python 07_p1_server.py 2>&1 | tee /tmp/p1.log
