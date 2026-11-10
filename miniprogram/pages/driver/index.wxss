@@ -1,0 +1,29 @@
+.bar { height: 14rpx; background: #e9edf2; border-radius: 999rpx; overflow: hidden; margin-top: 20rpx; }
+
+.bar-in { height: 100%; background: linear-gradient(90deg, #07C160, #5ede9c); border-radius: 999rpx; }
+
+.next {
+  background: #f4fdf8;
+  border: 3rpx solid #07C160;
+  border-radius: 24rpx;
+  padding: 26rpx;
+  margin-bottom: 24rpx;
+}
+
+.next-name { font-size: 36rpx; font-weight: 700; margin: 16rpx 0 18rpx; }
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  font-size: 25rpx;
+  color: #374151;
+  padding: 8rpx 0;
+}
+
+.kv-r { max-width: 62%; text-align: right; font-weight: 600; }
+
+.money-row { border-top: 1rpx dashed #cdebd8; margin-top: 10rpx; padding-top: 16rpx; }
+
+.ops { display: flex; gap: 16rpx; margin-top: 20rpx; }
+
+.ops .btn { flex: 1; }

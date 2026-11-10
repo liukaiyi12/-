@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新平食品 · P1 骨架</title>
+<style>
+  *{box-sizing:border-box}
+  :root{--ink:#14171a;--sub:#6b7280;--line:#e6e9ee;--bg:#f5f7fa;--card:#fff;
+    --green:#07C160;--green-d:#06AD56;--red:#e5484d;--blue:#2B7FFF;--amber:#f5a524}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:13.5px}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+  header h1{font-size:15px;margin:0;font-weight:700}
+  .who{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffd479,#ff9f43);
+    display:grid;place-items:center;font-size:11px;font-weight:700;color:#7a4a00}
+  .who .nm{font-size:12.5px;font-weight:600}
+  .role{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#eef4ff;color:#1b5fd0;font-weight:700}
+  .role.cost{background:#e6f7ee;color:#06874a}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:10px 20px 0}
+  .chip{font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:5px 9px;color:#4b5563}
+  .chip b{color:var(--ink)}
+  nav{display:flex;gap:6px;padding:10px 20px 0;flex-wrap:wrap}
+  nav button{border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:10px;
+    font-size:13px;cursor:pointer;font-family:inherit;color:#4b5563}
+  nav button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  main{padding:16px 20px 60px;max-width:1180px}
+  .panel{display:none}.panel.on{display:block}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .card h2{font-size:13.5px;margin:0 0 12px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .card h2 .hint{font-weight:400;font-size:11.5px;color:var(--sub);margin-left:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{font-size:11.5px;color:var(--sub);font-weight:600;background:#fbfcfd}
+  tr:hover td{background:#fafbfc}
+  code{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;background:#f3f5f8;
+    padding:1px 5px;border-radius:5px;color:#374151}
+  .miss{color:var(--red);font-size:11.5px}.ok{color:var(--green-d);font-weight:600}.off{color:#9aa2ac}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 11px;font-size:12px;
+    cursor:pointer;font-family:inherit;color:#374151;white-space:nowrap}
+  .btn:hover{border-color:#c9d2dd}
+  .btn.pri{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .fld{display:flex;flex-direction:column;gap:5px}
+  .fld label{font-size:11.5px;color:var(--sub)}
+  input,select{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:13px;
+    font-family:inherit;background:#fff;outline:none;min-width:120px}
+  input:focus,select:focus{border-color:#9fb4cc;box-shadow:0 0 0 3px rgba(43,127,255,.08)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .kpi .k{font-size:11.5px;color:var(--sub)}
+  .kpi .v{font-size:22px;font-weight:750;margin-top:6px;letter-spacing:-.4px}
+  .kpi .v small{font-size:12px;font-weight:500;color:var(--sub)}
+  #toast{position:fixed;right:18px;bottom:18px;max-width:540px;z-index:60;display:flex;
+    flex-direction:column;gap:8px}
+  .msg{background:#fff;border:1px solid var(--line);border-left:4px solid var(--green);
+    border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px rgba(20,23,26,.12);font-size:12.5px;
+    line-height:1.65}
+  .msg.err{border-left-color:var(--red)}
+  .msg .t{font-weight:700;margin-bottom:4px}
+  .msg ul{margin:6px 0 0;padding-left:18px}
+  .flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--sub)}
+  .flow span{background:#f3f5f8;border-radius:6px;padding:3px 8px}
+  .flow span.done{background:#e6f7ee;color:#06874a;font-weight:600}
+  /* 登录 */
+  #login{position:fixed;inset:0;background:linear-gradient(160deg,#eef2f8,#dfe5ee);z-index:100;
+    display:none;place-items:center;padding:20px}
+  #login.on{display:grid}
+  .lbox{background:#fff;border-radius:18px;padding:26px;width:100%;max-width:400px;
+    box-shadow:0 24px 60px rgba(24,32,44,.18)}
+  .lbox h2{margin:0 0 4px;font-size:17px}
+  .lbox p{margin:0 0 18px;font-size:12px;color:var(--sub);line-height:1.6}
+  .lbox .fld{width:100%;margin-bottom:12px}
+  .lbox input{width:100%}
+  .quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .quick button{font-size:11px;border:1px solid var(--line);background:#fbfcfd;border-radius:999px;
+    padding:5px 10px;cursor:pointer;font-family:inherit;color:#4b5563}
+  .quick button:hover{border-color:#c9d2dd;background:#fff}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <h2>新平食品 · P1 骨架</h2>
+    <p>不同账号看到的数据不一样——这是这套系统的重点。<br>密码统一 <code>demo1234</code>，点下面任意账号直接进。</p>
+    <div class="fld"><label>账号</label><input id="l-user" value="boss" autocomplete="username"></div>
+    <div class="fld"><label>密码</label><input id="l-pw" type="password" value="demo1234"></div>
+    <button class="btn pri" style="width:100%;padding:11px" onclick="doLogin()">登录</button>
+    <div class="quick" id="l-quick"></div>
+  </div>
+</div>
+
+<header>
+  <h1>新平食品 · P1 骨架</h1>
+  <div class="who">
+    <a href="/store" class="btn" style="text-decoration:none;font-size:12px">门店端 ↗</a>
+    <a href="/driver" class="btn" style="text-decoration:none;font-size:12px">司机端 ↗</a>
+    <span class="avatar" id="u-av">—</span>
+    <span class="nm" id="u-nm">未登录</span>
+    <span class="role" id="u-role"></span>
+    <button class="btn" onclick="logout()">退出</button>
+  </div>
+</header>
+<div class="chips" id="chips"></div>
+
+<nav id="nav">
+  <button data-t="m" class="on">① 主数据</button>
+  <button data-t="o">② 下单</button>
+  <button data-t="l">③ 订单</button>
+  <button data-t="s">④ 库存</button>
+  <button data-t="d">⑤ 看板</button>
+  <button data-t="p" id="nav-p">⑥ 排产</button>
+  <button data-t="a" id="nav-a" style="display:none">⑦ 审计日志</button>
+</nav>
+
+<main>
+  <div class="panel on" id="p-m">
+    <div class="card">
+      <h2>主数据完备度 <span class="hint">缺哪几列就会锁住对应动作</span></h2>
+      <div class="kpis" id="ms-kpi"></div>
+      <div class="row">
+        <button class="btn pri" onclick="demoSetup()" id="btn-demo">一键填充演示数据</button>
+        <button class="btn" onclick="demoOrders()" id="btn-demo2">再生成 3 张分布在不同区域的订单</button>
+        <button class="btn" onclick="resetAll()" id="btn-reset">重置数据库</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>商品主数据 <span class="hint" id="ms-note"></span></h2>
+      <div class="row" style="margin-bottom:10px">
+        <div class="fld"><label>筛选</label>
+          <input id="ms-q" placeholder="SKU 或品名，回车" onkeydown="if(event.key==='Enter')loadMaster()"></div>
+        <button class="btn" onclick="loadMaster()">刷新</button>
+      </div>
+      <div style="overflow:auto;max-height:520px"><table id="ms-tb"></table></div>
+    </div>
+    <div class="card" id="fill-card">
+      <h2>补一行数据（仅老板可操作）</h2>
+      <div class="row">
+        <div class="fld"><label>SKU</label><input id="f-sku" placeholder="KY001-1K-B-1" style="width:170px"></div>
+        <div class="fld"><label>装箱 H</label><input id="f-box" type="number" value="20" style="width:80px"></div>
+        <div class="fld"><label>经销价 P</label><input id="f-price" type="number" value="8.4" step="0.01" style="width:90px"></div>
+        <div class="fld"><label>成本</label><input id="f-cost" type="number" value="5.9" step="0.01" style="width:90px"></div>
+        <div class="fld"><label>保质期 J</label><input id="f-life" type="number" value="6" style="width:80px"></div>
+        <div class="fld"><label>储存 K</label>
+          <select id="f-store"><option>常温</option><option>常温阴凉干燥</option><option>冷藏</option><option>冷冻</option></select></div>
+        <button class="btn pri" onclick="fillOne()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-o">
+    <div class="card">
+      <h2>下单 <span class="hint" id="o-store-hint"></span></h2>
+      <div class="row">
+        <div class="fld"><label>门店（受你的数据范围限制）</label><select id="o-store" style="min-width:260px"></select></div>
+        <div class="fld"><label>商品</label><select id="o-sku" style="min-width:320px"></select></div>
+        <div class="fld"><label>箱数</label><input id="o-carton" type="number" value="2" min="1" style="width:80px"></div>
+        <button class="btn" onclick="addLine()">加入本单</button>
+        <button class="btn pri" onclick="submitOrder()">提交订单</button>
+      </div>
+      <div style="margin-top:12px"><table id="o-cart"></table></div>
+      <p class="off" style="margin:10px 0 0;font-size:11.5px">
+        校验顺序：门店权限 → 主数据（箱规/价格）→ 库存 FEFO → 信用额度。任一项不过，整单不落库。
+      </p>
+    </div>
+  </div>
+
+  <div class="panel" id="p-l">
+    <div class="card">
+      <h2>订单列表 <span class="hint" id="l-note"></span></h2>
+      <table id="l-tb"></table>
+    </div>
+    <div class="card">
+      <h2>订单详情</h2>
+      <div id="l-detail" class="off">点上面「详情」查看</div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-s">
+    <div class="card">
+      <h2>批次库存 <span class="hint">待检不可出库；出库按到期日先出</span></h2>
+      <table id="s-tb"></table>
+    </div>
+    <div class="card">
+      <h2>入库</h2>
+      <div class="row">
+        <div class="fld"><label>SKU</label><input id="i-sku" placeholder="KY001-1K-B-1" style="width:170px"></div>
+        <div class="fld"><label>批次号</label><input id="i-batch" value="P2611101-A-009" style="width:160px"></div>
+        <div class="fld"><label>数量(袋)</label><input id="i-qty" type="number" value="200" style="width:100px"></div>
+        <div class="fld"><label>生产日</label><input id="i-prod" value="2026-11-10" style="width:120px"></div>
+        <div class="fld"><label>到期日</label><input id="i-exp" value="2027-05-10" style="width:120px"></div>
+        <button class="btn pri" onclick="doInbound()">入库</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-d">
+    <div class="kpis" id="d-kpi"></div>
+    <div class="card"><h2>订单状态分布</h2><div class="flow" id="d-flow"></div></div>
+    <div class="card"><h2>我的门店范围</h2><table id="d-stores"></table></div>
+    <div class="card"><h2>应收</h2><table id="d-ar"></table></div>
+  </div>
+
+  <div class="panel" id="p-p">
+    <div class="card">
+      <h2>工单与排产 <span class="hint">核心不是算得多聪明，是少洗几次锅</span></h2>
+      <div class="row">
+        <button class="btn pri" onclick="woFromOrders()">从订单生成工单</button>
+        <button class="btn" onclick="woDemo()">生成 12 张演示工单（跨 6 族）</button>
+        <div class="fld"><label>排产策略</label>
+          <select id="s-strategy">
+            <option value="family">成块（同族连做，洗锅最少）</option>
+            <option value="smart">智能（成块 + 逾期风险）</option>
+            <option value="edd">纯交期（现状，洗锅最多）</option>
+          </select></div>
+        <button class="btn pri" onclick="runSchedule()">运行排产</button>
+        <button class="btn" onclick="loadCompare()">三策略对比</button>
+      </div>
+      <div style="margin-top:12px;overflow:auto"><table id="wo-tb"></table></div>
+    </div>
+
+    <div class="card">
+      <h2>三策略对比 <span class="hint">同一批工单，换排法差多少</span></h2>
+      <table id="cmp-tb"><tr><td class="off">点上面「三策略对比」</td></tr></table>
+    </div>
+
+    <div class="card">
+      <h2>排产结果 <span class="hint" id="sch-note"></span></h2>
+      <div id="gantt" class="off">点「运行排产」</div>
+    </div>
+
+    <div class="card">
+      <h2>换线矩阵（分钟，可逐格改） <span class="hint">车间主任经验落成数据</span></h2>
+      <div id="mx-tb" style="overflow:auto"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-a">
+    <div class="card">
+      <h2>账号解锁 <span class="hint">连错 5 次会被锁 5 分钟，这里可以提前解</span></h2>
+      <div class="row">
+        <div class="fld"><label>账号</label><input id="unlock-u" placeholder="例如 sales3" style="width:200px"></div>
+        <button class="btn" onclick="unlock()">解锁</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>审计日志 <span class="hint">谁改了什么、谁下了什么单</span></h2>
+      <table id="a-tb"></table>
+    </div>
+  </div>
+</main>
+<div id="toast"></div>
+
+<script>
+const API = '';
+let TOKEN = localStorage.getItem('p1.token') || '';
+let ME = null;
+let CART = [];
+let SKUS = [];
+let STORES = [];
+
+async function call(path, method = 'GET', body) {
+  const opt = { method, headers: { 'Content-Type': 'application/json' } };
+  if (TOKEN) opt.headers['Authorization'] = 'Bearer ' + TOKEN;
+  if (body) opt.body = JSON.stringify(body);
+  const r = await fetch(API + path, opt);
+  let j;
+  try { j = await r.json(); } catch (e) { j = { ok: false, message: '服务返回异常' }; }
+  if (r.status === 401) { showLogin(); throw { ok: false, message: '登录已过期，请重新登录' }; }
+  if (!j.ok) throw j;
+  return j;
+}
+
+function toast(title, data, isErr) {
+  const box = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'msg' + (isErr ? ' err' : '');
+  let extra = '';
+  if (data && data.missing && data.missing.length)
+    extra = '<ul>' + data.missing.map(m => `<li>缺 <b>${m.name}</b>（${m.field}）→ <code>${m.hint}</code></li>`).join('') + '</ul>';
+  if (data && data.message && data.message !== title)
+    extra += `<div style="color:#6b7280;margin-top:4px">${data.message}</div>`;
+  el.innerHTML = `<div class="t">${title}</div>${extra}`;
+  box.appendChild(el);
+  setTimeout(() => el.remove(), isErr ? 8000 : 3000);
+}
+
+async function guard(fn, okTitle) {
+  try { const r = await fn(); if (okTitle) toast(okTitle, r); await refreshAll(); return r; }
+  catch (e) { toast('操作未通过', e, true); return null; }
+}
+
+/* ---------- 登录 ---------- */
+function showLogin() {
+  document.getElementById('login').classList.add('on');
+}
+
+async function loadAccounts() {
+  try {
+    const r = await fetch(API + '/api/auth/accounts').then(x => x.json());
+    document.getElementById('l-quick').innerHTML = r.items.map(a =>
+      `<button onclick="quick('${a.username}')">${a.name} · ${a.role_cn}</button>`).join('');
+  } catch (e) { /* ignore */ }
+}
+
+function quick(u) {
+  document.getElementById('l-user').value = u;
+  document.getElementById('l-pw').value = 'demo1234';
+  doLogin();
+}
+
+async function doLogin() {
+  const username = document.getElementById('l-user').value.trim();
+  const password = document.getElementById('l-pw').value;
+  try {
+    const r = await fetch(API + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    }).then(x => x.json());
+    if (!r.ok) { toast('登录失败', r, true); return; }
+    TOKEN = r.token;
+    localStorage.setItem('p1.token', TOKEN);
+    ME = r.user;
+    document.getElementById('login').classList.remove('on');
+    boot();
+  } catch (e) { toast('登录失败', { message: String(e) }, true); }
+}
+
+function logout() {
+  localStorage.removeItem('p1.token');
+  TOKEN = ''; ME = null;
+  location.reload();
+}
+
+function paintUser() {
+  document.getElementById('u-av').textContent = (ME.name || '?')[0];
+  document.getElementById('u-nm').textContent = ME.name;
+  const el = document.getElementById('u-role');
+  el.textContent = ME.role_cn;
+  el.className = 'role' + (ME.see_cost ? ' cost' : '');
+  document.getElementById('nav-a').style.display =
+    ['boss', 'fin'].includes(ME.role) ? '' : 'none';
+  document.getElementById('fill-card').style.display = ME.role === 'boss' ? '' : 'none';
+  document.getElementById('btn-demo').style.display = ME.role === 'boss' ? '' : 'none';
+  document.getElementById('btn-demo2').style.display = ME.role === 'boss' ? '' : 'none';
+  document.getElementById('btn-reset').style.display = ME.role === 'boss' ? '' : 'none';
+  document.getElementById('d-kpi').style.setProperty('--x', '');
+  document.querySelector('nav button[data-t="s"]').style.display =
+    ['driver', 'store'].includes(ME.role) ? 'none' : '';
+  document.getElementById('nav-p').style.display =
+    ['boss', 'wh', 'cs', 'director'].includes(ME.role) ? '' : 'none';
+}
+
+/* ---------- 主数据 ---------- */
+async function loadMaster() {
+  const d = await call('/api/master/skus');
+  SKUS = d.items;
+  const q = (document.getElementById('ms-q').value || '').trim();
+  const rows = d.items.filter(s => !q || s.sku_code.includes(q) || s.name.includes(q));
+  const showCost = ME.see_cost;
+  document.getElementById('ms-note').textContent = showCost
+    ? '你是「' + ME.role_cn + '」，可以看到成本列'
+    : '你是「' + ME.role_cn + '」，成本列对你不可见（服务端直接不回传）';
+  document.getElementById('ms-tb').innerHTML = `<thead><tr>
+      <th>SKU</th><th>品名</th><th>箱规 H</th><th>价格 P</th>${showCost ? '<th>成本</th>' : ''}
+      <th>保质期 J</th><th>储存 K</th><th>可下单</th><th>可入库</th></tr></thead><tbody>` +
+    rows.map(s => `<tr>
+      <td><code>${s.sku_code}</code></td><td>${s.name}</td>
+      <td class="${s.units_per_carton === null ? 'miss' : ''}">${s.units_per_carton ?? '缺'}</td>
+      <td class="${s.price === null ? 'miss' : ''}">${s.price === null ? '缺' : '¥' + s.price.toFixed(2)}</td>
+      ${showCost ? `<td class="${s.cost === null ? 'off' : 'ok'}">${s.cost === null ? '—' : '¥' + s.cost.toFixed(2)}</td>` : ''}
+      <td class="${s.shelf_life_month === null ? 'miss' : ''}">${s.shelf_life_month ?? '缺'}</td>
+      <td class="${s.storage_cond === null ? 'miss' : ''}">${s.storage_cond ?? '缺'}</td>
+      <td>${s.can_order ? '<span class="ok">可</span>' : '<span class="miss">不可</span>'}</td>
+      <td>${s.can_inbound ? '<span class="ok">可</span>' : '<span class="miss">不可</span>'}</td>
+    </tr>`).join('') + '</tbody>';
+
+  const orderable = d.items.filter(s => s.can_order);
+  document.getElementById('o-sku').innerHTML = orderable.length
+    ? orderable.map(s => `<option value="${s.sku_code}">${s.name} ¥${s.price.toFixed(2)}/袋 · ${s.units_per_carton}袋/箱</option>`).join('')
+    : '<option value="">（没有可下单的 SKU —— 先补箱规和价格）</option>';
+
+  const st = await call('/api/master/status');
+  document.getElementById('ms-kpi').innerHTML = `
+    <div class="kpi"><div class="k">SKU 总数</div><div class="v">${st.total}</div></div>
+    <div class="kpi"><div class="k">可下单（H+P）</div><div class="v">${st.can_order}<small>/${st.total}</small></div></div>
+    <div class="kpi"><div class="k">可入库（J+K）</div><div class="v">${st.can_inbound}<small>/${st.total}</small></div></div>
+    <div class="kpi"><div class="k">可贴标（N+M+L）</div><div class="v">${st.can_label}<small>/${st.total}</small></div></div>`;
+  window.__st = st;
+}
+
+async function fillOne() {
+  const body = {
+    sku_code: document.getElementById('f-sku').value.trim(),
+    units_per_carton: document.getElementById('f-box').value,
+    price_cent: Math.round(parseFloat(document.getElementById('f-price').value || 0) * 100),
+    cost_cent: Math.round(parseFloat(document.getElementById('f-cost').value || 0) * 100),
+    shelf_life_month: document.getElementById('f-life').value,
+    storage_cond: document.getElementById('f-store').value
+  };
+  if (!body.sku_code) return toast('先填 SKU', { message: '例如 KY001-1K-B-1' }, true);
+  await guard(() => call('/api/master/fill', 'POST', body), '主数据已补');
+}
+
+async function demoSetup() {
+  await guard(() => call('/api/demo/setup', 'POST', {}), '演示数据就绪：3 个 SKU 补齐 + 4 个批次入库');
+}
+
+async function demoOrders() {
+  const r = await guard(() => call('/api/demo/orders', 'POST', {}), null);
+  if (r) toast('已生成 ' + (r.orders.length || 0) + ' 张订单', { message: '切到 sales1/sales2/sales3 看各自只看到自己那单' });
+}
+
+async function resetAll() {
+  if (!confirm('清空所有订单与库存，回到"只有 72 个空 SKU"？')) return;
+  await guard(() => call('/api/reset', 'POST', {}), '已重置');
+}
+
+/* ---------- 门店 ---------- */
+async function loadStores() {
+  const d = await call('/api/stores');
+  STORES = d.items;
+  document.getElementById('o-store').innerHTML = d.items.map(s =>
+    `<option value="${s.id}">${s.name}（${s.region}）</option>`).join('')
+    || '<option value="">（无可见门店）</option>';
+  if (ME.role === 'store') {
+    document.getElementById('o-store').value = ME.store_id;
+    document.getElementById('o-store-hint').textContent = '门店账号只能给自己下单';
+  } else {
+    document.getElementById('o-store-hint').textContent = `你只能看到 ${d.items.length} 家门店`;
+  }
+  document.getElementById('d-stores').innerHTML = d.items.length
+    ? `<thead><tr><th>门店</th><th>区域</th><th>归属业务员</th><th>线路</th><th>账期</th><th>额度</th><th>订单数</th></tr></thead><tbody>` +
+      d.items.map(s => `<tr><td>${s.name}</td><td>${s.region}</td><td>${s.owner}</td>
+        <td>${s.route}</td><td>${s.settle}</td><td>¥${s.credit_limit.toFixed(0)}</td>
+        <td>${s.orders}</td></tr>`).join('') + '</tbody>'
+    : '<tr><td class="off">没有可见门店</td></tr>';
+
+  const st = window.__st || { total: 72, can_order: 0, can_inbound: 0, can_label: 0 };
+  document.getElementById('chips').innerHTML = `
+    <span class="chip">账号 <b>${ME.username}</b> · ${ME.role_cn}</span>
+    <span class="chip">可见门店 <b>${d.items.length}</b></span>
+    <span class="chip">可下单 <b>${st.can_order}</b>/${st.total}</span>
+    <span class="chip">${ME.see_cost ? '可见成本 <b>是</b>' : '可见成本 <b>否</b>'}</span>
+    <span class="chip">${ME.can_operate ? '可推进订单 <b>是</b>' : '只读'}</span>`;
+}
+
+/* ---------- 下单 ---------- */
+function addLine() {
+  const code = document.getElementById('o-sku').value;
+  const cartons = parseInt(document.getElementById('o-carton').value || '1', 10);
+  if (!code) return toast('没有可下单的商品', { message: '先补箱规和价格' }, true);
+  const s = SKUS.find(x => x.sku_code === code);
+  const i = CART.findIndex(x => x.sku_code === code);
+  if (i >= 0) CART[i].cartons += cartons;
+  else CART.push({ sku_code: code, cartons, name: s.name, price: s.price, per: s.units_per_carton });
+  renderCart();
+}
+
+function renderCart() {
+  const tb = document.getElementById('o-cart');
+  if (!CART.length) { tb.innerHTML = '<tr><td class="off">本单还没有商品</td></tr>'; return; }
+  const total = CART.reduce((a, c) => a + c.cartons * c.per * c.price, 0);
+  tb.innerHTML = `<thead><tr><th>商品</th><th>箱数</th><th>袋数</th><th>金额</th><th></th></tr></thead><tbody>` +
+    CART.map((c, i) => `<tr><td>${c.name} <code>${c.sku_code}</code></td><td>${c.cartons}</td>
+      <td>${c.cartons * c.per}</td><td>¥${(c.cartons * c.per * c.price).toFixed(2)}</td>
+      <td><button class="btn" onclick="CART.splice(${i},1);renderCart()">移除</button></td></tr>`).join('') +
+    `<tr><td colspan="3" style="text-align:right;color:#6b7280">合计</td>
+     <td colspan="2"><b>¥${total.toFixed(2)}</b></td></tr></tbody>`;
+}
+
+async function submitOrder() {
+  if (!CART.length) return toast('本单为空', {}, true);
+  const store_id = document.getElementById('o-store').value;
+  const r = await guard(() => call('/api/orders', 'POST', {
+    store_id, lines: CART.map(c => ({ sku_code: c.sku_code, cartons: c.cartons }))
+  }), null);
+  if (r) {
+    toast(`下单成功 ${r.order_no} ｜ ¥${r.amount.toFixed(2)}`, { message: '已分配批次，库存已预占' });
+    CART = []; renderCart(); go('l'); loadOrders();
+  }
+}
+
+/* ---------- 订单 ---------- */
+const NEXT = { '已确认': ['拣货', 'pick'], '待发货': ['出库配送', 'ship'], '配送中': ['签收', 'sign'] };
+
+async function loadOrders() {
+  const d = await call('/api/orders');
+  const tb = document.getElementById('l-tb');
+  document.getElementById('l-note').textContent =
+    `按你的数据范围过滤后共 ${d.items.length} 单`;
+  if (!d.items.length) { tb.innerHTML = '<tr><td class="off">你范围内还没有订单</td></tr>'; return; }
+  tb.innerHTML = `<thead><tr><th>单号</th><th>门店</th><th>金额</th><th>状态</th><th>下单人</th><th>操作</th></tr></thead><tbody>` +
+    d.items.map(o => {
+      const nx = NEXT[o.status];
+      const canOp = ME.can_operate;
+      return `<tr><td><code>${o.order_no}</code></td><td>${o.store}</td>
+        <td>¥${o.amount.toFixed(2)}</td><td><b>${o.status}</b></td><td class="off">${o.created_by || '—'}</td>
+        <td><button class="btn" onclick="showOrder('${o.order_no}')">详情</button>
+        ${nx && canOp ? `<button class="btn pri" onclick="advance('${o.order_no}','${nx[1]}')">${nx[0]}</button>` : ''}
+        </td></tr>`;
+    }).join('') + '</tbody>';
+}
+
+async function showOrder(no) {
+  const d = await call('/api/orders/' + no);
+  const o = d.order;
+  document.getElementById('l-detail').className = '';
+  document.getElementById('l-detail').innerHTML = `
+    <div style="margin-bottom:10px"><b>${o.order_no}</b> ｜ ${o.store} ｜ ${o.status} ｜ ¥${o.amount.toFixed(2)}
+      ${o.delivery ? ' ｜ 配送单 <code>' + o.delivery + '</code>' : ''}</div>
+    <table><thead><tr><th>商品</th><th>箱</th><th>袋</th><th>单价</th></tr></thead><tbody>
+      ${o.items.map(i => `<tr><td>${i.name} <code>${i.sku_code}</code></td><td>${i.cartons}</td>
+        <td>${i.qty_unit}</td><td>¥${i.price.toFixed(2)}</td></tr>`).join('')}</tbody></table>
+    <p style="margin:12px 0 6px;font-size:12px;color:#6b7280">FEFO 批次分配</p>
+    <table><thead><tr><th>商品</th><th>批次</th><th>到期日</th><th>取数</th></tr></thead><tbody>
+      ${o.alloc.map(a => `<tr><td>${a.sku}</td><td><code>${a.batch_no}</code></td>
+        <td>${a.expire}</td><td>${a.qty}</td></tr>`).join('')}</tbody></table>`;
+}
+
+async function advance(no, act) {
+  if (act === 'sign') {
+    const d = await call('/api/orders/' + no);
+    const r = await guard(() => call(`/api/deliveries/${d.order.delivery}/sign`, 'POST',
+      { receiver: '李老板' }), '已签收，应收出账');
+    if (r) loadOrders();
+    return;
+  }
+  const r = await guard(() => call(`/api/orders/${no}/${act}`, 'POST', {}),
+    act === 'pick' ? '拣货完成' : '已出库，生成配送单');
+  if (r) loadOrders();
+}
+
+/* ---------- 库存 ---------- */
+async function loadStock() {
+  if (['driver', 'store'].includes(ME.role)) return;
+  const d = await call('/api/stock');
+  const tb = document.getElementById('s-tb');
+  if (!d.items.length) { tb.innerHTML = '<tr><td class="off">还没有库存</td></tr>'; return; }
+  tb.innerHTML = `<thead><tr><th>SKU</th><th>品名</th><th>批次</th><th>到期日</th><th>在手</th>
+      <th>已锁</th><th>质检</th><th>操作</th></tr></thead><tbody>` +
+    d.items.map(b => `<tr><td><code>${b.sku_code}</code></td><td>${b.name}</td>
+      <td><code>${b.batch_no}</code></td><td>${b.expire_date}</td><td>${b.qty_on_hand}</td>
+      <td>${b.qty_locked}</td><td class="${b.qc_status === '合格' ? 'ok' : 'miss'}">${b.qc_status}</td>
+      <td>${b.qc_status === '待检' && ME.can_operate
+        ? `<button class="btn" onclick="release('${b.batch_no}')">质检放行</button>` : ''}</td></tr>`).join('') +
+    '</tbody>';
+}
+
+async function release(bno) {
+  await guard(() => call(`/api/batches/${bno}/release`, 'POST', {}), '批次已放行');
+}
+
+async function doInbound() {
+  const body = {
+    sku_code: document.getElementById('i-sku').value.trim(),
+    batch_no: document.getElementById('i-batch').value.trim(),
+    qty_unit: parseInt(document.getElementById('i-qty').value || '0', 10),
+    prod_date: document.getElementById('i-prod').value,
+    expire_date: document.getElementById('i-exp').value
+  };
+  if (!body.sku_code) return toast('先填 SKU', {}, true);
+  await guard(() => call('/api/inbound', 'POST', body), '入库成功（待检，需放行）');
+}
+
+/* ---------- 看板 ---------- */
+async function loadDash() {
+  const d = await call('/api/dashboard');
+  let html = `
+    <div class="kpi"><div class="k">订单数</div><div class="v">${d.orders}</div></div>
+    <div class="kpi"><div class="k">订单金额</div><div class="v">¥${d.amount.toFixed(2)}</div></div>
+    <div class="kpi"><div class="k">应收占用</div><div class="v">¥${d.ar.toFixed(2)}</div></div>
+    <div class="kpi"><div class="k">可见额度合计</div><div class="v">¥${d.credit_limit.toFixed(0)}</div></div>`;
+  if (d.gross_margin !== undefined) {
+    html += `<div class="kpi"><div class="k">毛利率</div><div class="v">${d.gross_margin}<small>%</small></div></div>`;
+  }
+  document.getElementById('d-kpi').innerHTML = html;
+
+  const order = ['已确认', '待发货', '配送中', '已回单'];
+  document.getElementById('d-flow').innerHTML = order.map((s, i) => {
+    const n = d.by_status[s] || 0;
+    return `${i ? '<span style="background:none;color:#c3ccd8">→</span>' : ''}
+      <span class="${n ? 'done' : ''}">${s} ${n}</span>`;
+  }).join('');
+
+  const ar = await call('/api/receivables');
+  const canPay = ['boss', 'fin'].includes(ME.role);
+  document.getElementById('d-ar').innerHTML = ar.items.length
+    ? `<thead><tr><th>订单</th><th>门店</th><th>金额</th><th>已收</th><th>账期日</th><th>状态</th>${canPay ? '<th></th>' : ''}</tr></thead><tbody>` +
+      ar.items.map(r => `<tr><td><code>${r.order_no}</code></td><td>${r.store}</td>
+        <td>¥${r.amount.toFixed(2)}</td><td>¥${r.paid.toFixed(2)}</td>
+        <td>${r.due_date || '—'}</td><td>${r.status}</td>
+        ${canPay ? `<td>${r.status !== '已收'
+          ? `<button class="btn" onclick="pay('${r.order_no}',${(r.amount - r.paid).toFixed(2)})">登记回款</button>`
+          : ''}</td>` : ''}</tr>`).join('') + '</tbody>'
+    : '<tr><td class="off">还没有应收</td></tr>';
+}
+
+async function pay(orderNo, left) {
+  const v = window.prompt('登记回款：本次收到多少元？（未收 ¥' + left + '）', left);
+  if (v === null) return;
+  const amt = Math.round(parseFloat(v) * 100);
+  if (!amt || amt <= 0) return toast('金额不对', {}, true);
+  await guard(() => call('/api/payments', 'POST',
+    { order_no: orderNo, amount_cent: amt, method: '转账' }), '已登记回款');
+}
+
+async function unlock() {
+  const u = document.getElementById('unlock-u').value.trim();
+  if (!u) return toast('先填账号', {}, true);
+  await guard(() => call('/api/auth/unlock', 'POST', { username: u }), `${u} 已解锁`);
+}
+
+async function loadAudit() {  const d = await call('/api/audit');
+  document.getElementById('a-tb').innerHTML =
+    `<thead><tr><th>时间</th><th>账号</th><th>角色</th><th>动作</th><th>对象</th><th>详情</th></tr></thead><tbody>` +
+    d.items.map(r => `<tr><td class="off">${r.at}</td><td>${r.username}</td><td>${r.role}</td>
+      <td><b>${r.action}</b></td><td><code>${r.target || ''}</code></td>
+      <td class="off">${r.detail || ''}</td></tr>`).join('') + '</tbody>';
+}
+
+/* ---------- 排产 ---------- */
+async function loadWorkorders() {
+  const d = await call('/api/workorders');
+  const tb = document.getElementById('wo-tb');
+  if (!d.items.length) {
+    tb.innerHTML = '<tr><td class="off">还没有工单。点「从订单生成工单」——需要先有「已确认」的订单</td></tr>';
+    return;
+  }
+  const total = d.items.reduce((a, x) => a + x.qty_unit, 0);
+  tb.innerHTML = `<thead><tr><th>工单</th><th>商品</th><th>族</th><th>数量</th><th>锅次</th>
+      <th>交期</th><th>状态</th></tr></thead><tbody>` +
+    d.items.map(w => `<tr><td><code>${w.wo_no}</code></td><td>${w.sku}</td>
+      <td><b>${w.family}</b></td><td>${w.qty_unit} 袋</td><td>${w.pot_count}</td>
+      <td>D+${w.due_day}</td><td>${w.status}</td></tr>`).join('') +
+    `<tr><td colspan="3" style="text-align:right;color:#6b7280">合计</td>
+     <td colspan="4"><b>${total} 袋</b></td></tr></tbody>`;
+}
+
+async function woFromOrders() {
+  const r = await guard(() => call('/api/workorders/from-orders', 'POST', {}), null);
+  if (r) {
+    toast(`生成 ${r.created.length} 张工单`, { message: '按 SKU 汇总了待生产订单' });
+    loadWorkorders();
+  }
+}
+
+async function woDemo() {
+  const r = await guard(() => call('/api/demo/workorders', 'POST', {}), null);
+  if (r) {
+    toast(`生成 ${r.created.length} 张工单`, { message: '跨 6 个族，现在点「三策略对比」看得出差别' });
+    loadWorkorders();
+  }
+}
+
+async function loadCompare() {
+  const r = await guard(() => call('/api/schedule/compare'), null);
+  if (!r) return;
+  const rows = [['edd', '纯交期'], ['family', '成块'], ['smart', '智能']];
+  const best = Math.min(...Object.values(r.compare).map(v => v.clean_total_min));
+  document.getElementById('cmp-tb').innerHTML =
+    `<thead><tr><th>策略</th><th>洗锅次数</th><th>洗锅分钟</th><th>完工(天)</th><th>逾期</th><th></th></tr></thead><tbody>` +
+    rows.map(([k, cn]) => {
+      const v = r.compare[k];
+      const win = v.clean_total_min === best;
+      return `<tr><td><b>${cn}</b></td><td>${v.clean_count}</td>
+        <td>${v.clean_total_min}</td><td>${v.makespan_day}</td>
+        <td class="${v.late_count ? 'miss' : 'ok'}">${v.late_count}</td>
+        <td>${win ? '<span class="ok">洗锅最少</span>' : ''}</td></tr>`;
+    }).join('') + '</tbody>';
+  toast('对比完成', { message: '成块排法把洗锅从 ' + r.compare.edd.clean_count +
+    ' 次降到 ' + r.compare.family.clean_count + ' 次' });
+}
+
+async function runSchedule() {
+  const strategy = document.getElementById('s-strategy').value;
+  const r = await guard(() => call('/api/schedule/run', 'POST', { strategy }), null);
+  if (!r) return;
+  const m = r.metrics;
+  toast(`排产完成：${m.orders} 单，洗锅 ${m.clean_count} 次 / ${m.clean_total_min} 分`,
+    { message: `完工 ${m.makespan_day} 天` + (m.late_count ? `，逾期 ${m.late_count} 单` : '，无逾期') });
+  renderGantt(r);
+}
+
+function renderGantt(res) {
+  const steps = res.steps;
+  const span = Math.max(...steps.map(s => s.end_min));
+  const pots = [...new Set(steps.map(s => s.pot))].sort();
+  const colors = { '火锅底料': '#ffd479', '烤鱼': '#ff9b8a', '汤底': '#9fd4ff', '炒烧酱': '#f0a6d0',
+    '红油辣油': '#ff8f6b', '小吃面点': '#8fe0b0' };
+  let html = '';
+  for (const pot of pots) {
+    const list = steps.filter(s => s.pot === pot);
+    html += `<div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">${pot}（${list.length} 单）</div>
+      <div style="position:relative;height:34px;background:#f3f5f8;border-radius:8px">` +
+      list.map(s => {
+        const left = s.start_min / span * 100, w = (s.end_min - s.start_min) / span * 100;
+        return `<div title="${s.wo_no} ${s.family} ${s.qty_unit}袋"
+          style="position:absolute;left:${left}%;width:${w}%;top:5px;height:24px;
+          background:${colors[s.family] || '#c9d2dd'};border-radius:5px;font-size:10px;
+          line-height:24px;padding-left:5px;overflow:hidden;white-space:nowrap;
+          border:${s.clean_min ? '2px dashed #e5484d' : 'none'}">
+          ${s.wo_no}${s.clean_min ? ' 洗' + s.clean_min + '′' : ''}</div>`;
+      }).join('') + `</div></div>`;
+  }
+  const legend = Object.entries(colors).map(([f, c]) =>
+    `<span style="font-size:11px;margin-right:10px"><i style="display:inline-block;width:10px;height:10px;
+      background:${c};border-radius:3px;margin-right:4px"></i>${f}</span>`).join('');
+  document.getElementById('gantt').className = '';
+  document.getElementById('gantt').innerHTML = legend +
+    `<div style="margin:10px 0 4px;font-size:11px;color:#6b7280">
+      红虚线框 = 这单开始前要洗锅；横轴按工时比例</div>` + html +
+    `<table style="margin-top:10px"><thead><tr><th>序</th><th>工单</th><th>锅</th><th>族</th>
+      <th>洗锅</th><th>开始</th><th>结束</th><th>交期</th></tr></thead><tbody>` +
+    steps.map(s => `<tr><td>${s.seq}</td><td><code>${s.wo_no}</code></td><td>${s.pot}</td>
+      <td>${s.family}</td><td class="${s.clean_min ? 'miss' : 'off'}">${s.clean_min ? s.clean_min + '′' : '—'}</td>
+      <td>${s.start_at}</td><td>${s.end_at}${s.span_days ? '（次日）' : ''}</td>
+      <td>D+${s.due_day}${s.late_day ? ' <span class="miss">逾期' + s.late_day + '天</span>' : ''}</td></tr>`).join('') +
+    '</tbody></table>';
+  document.getElementById('sch-note').textContent =
+    `策略 ${res.strategy} ｜ 洗锅 ${res.metrics.clean_count} 次 / ${res.metrics.clean_total_min} 分 ｜ 完工 ${res.metrics.makespan_day} 天`;
+}
+
+async function loadMatrix() {
+  const d = await call('/api/schedule/matrix');
+  const fams = d.families;
+  let html = `<div style="font-size:11px;color:#6b7280;margin-bottom:8px">
+    行 = 从哪个族，列 = 换到哪个族，格子里的数字是洗锅分钟（改完点旁边的保存）</div>
+    <table style="min-width:720px"><thead><tr><th>从 ＼ 到</th>` +
+    fams.map(f => `<th style="font-size:11px">${f}</th>`).join('') + '</tr></thead><tbody>';
+  for (const a of fams) {
+    html += `<tr><th style="font-size:11px">${a}</th>`;
+    for (const b of fams) {
+      if (a === b) { html += '<td class="off" style="text-align:center">0</td>'; continue; }
+      const it = d.items.find(x => x.from === a && x.to === b) || { minutes: 45 };
+      html += `<td><input type="number" value="${it.minutes}" data-f="${a}" data-t="${b}"
+        style="width:62px;padding:3px 6px;font-size:11.5px;min-width:0"></td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table><div style="margin-top:10px"><button class="btn pri" onclick="saveMatrix()">保存矩阵</button></div>';
+  document.getElementById('mx-tb').innerHTML = html;
+}
+
+async function saveMatrix() {
+  const cells = [...document.querySelectorAll('#mx-tb input[data-f]')];
+  let n = 0;
+  for (const c of cells) {
+    try {
+      await call('/api/schedule/matrix', 'POST',
+        { from: c.dataset.f, to: c.dataset.t, minutes: parseInt(c.value, 10) });
+      n++;
+    } catch (e) { /* 无权限等，忽略 */ }
+  }
+  toast(`已保存 ${n} 个换线时间`, { message: '再运行排产看看结果变化' });
+}
+
+/* ---------- 启动 ---------- */
+function go(t) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + t));
+}
+document.getElementById('nav').addEventListener('click', e => {
+  if (e.target.dataset.t) go(e.target.dataset.t);
+});
+
+async function refreshAll() {
+  await loadMaster();
+  await loadStores();
+  await loadOrders();
+  await loadStock();
+  await loadDash();
+  if (['boss', 'wh', 'cs', 'director'].includes(ME.role)) {
+    await loadWorkorders();
+    await loadMatrix();
+  }
+  if (['boss', 'fin'].includes(ME.role)) await loadAudit();
+  renderCart();
+}
+
+async function boot() {
+  paintUser();
+  await refreshAll();
+}
+
+(async function init() {
+  loadAccounts();
+  if (!TOKEN) { showLogin(); return; }
+  try {
+    const me = await call('/api/auth/me');
+    ME = me.user;
+    paintUser();
+    await refreshAll();
+  } catch (e) { showLogin(); }
+})();
+</script>
+</body>
+</html>

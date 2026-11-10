@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install openpyxl==3.1.5
+
+      - name: 语法检查
+        run: |
+          python -m py_compile 07_p1_server.py p1_auth.py p1_schedule.py
+          python -m py_compile *_test.py 05_core_demo.py
+
+      - name: 启动服务
+        run: |
+          python 07_p1_server.py --port 8765 &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8765/api/health > /dev/null; then
+              echo "服务已启动"; break
+            fi
+            sleep 1
+          done
+          curl -s http://127.0.0.1:8765/api/health
+
+      - name: 业务流程与权限（74）
+        run: python 08_smoke_test.py
+
+      - name: 排产模型（14）
+        run: python 09_schedule_test.py
+
+      - name: 门店端与司机端（29）
+        run: python 10_store_driver_test.py
+
+      - name: 小程序工程（51）
+        run: python 11_miniprogram_test.py
+
+      - name: 补齐项（31）
+        run: python 12_gap_test.py
+
+      - name: 留空降级演示
+        run: python 05_core_demo.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            *结果.txt
+            05_运行输出.txt
+          retention-days: 7

@@ -1,0 +1,24 @@
+<view class="wrap">
+  <view class="card">
+    <view class="card-title">新建门店<text class="hint">扫街遇到的新店，就地建档</text></view>
+
+    <view class="muted" style="margin-bottom:8rpx;">门店名</view>
+    <input class="input" placeholder="例如：川味小厨" value="{{name}}" bindinput="onName" />
+
+    <view class="muted" style="margin-bottom:8rpx;">地址</view>
+    <input class="input" placeholder="例如：鄞州区中山东路88号" value="{{address}}" bindinput="onAddr" />
+
+    <view class="row" style="margin-bottom:20rpx;">
+      <view class="muted">{{locText}}</view>
+      <view class="tag" bindtap="loc">取当前位置</view>
+    </view>
+
+    <view class="muted" style="line-height:1.7;margin-bottom:20rpx;">
+      坐标决定以后能不能打卡：不填坐标的门店，打卡会被判「无法判断是否到店」。
+    </view>
+
+    <button class="btn" bindtap="save" disabled="{{saving}}">
+      {{saving ? '保存中…' : '保存并归到我名下'}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,21 @@
+.login { padding: 120rpx 48rpx; }
+
+.brand { font-size: 52rpx; font-weight: 700; letter-spacing: 2rpx; }
+.sub { font-size: 24rpx; color: #8a9199; margin-top: 10rpx; margin-bottom: 60rpx; }
+
+.box { background: #fff; border-radius: 28rpx; padding: 36rpx 32rpx; }
+
+.tip { margin: 24rpx 0 12rpx; line-height: 1.6; }
+
+.roles { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 12rpx; }
+
+.role {
+  width: calc(50% - 8rpx);
+  background: #f7f9fb;
+  border: 1rpx solid #eef1f5;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.rn { font-size: 26rpx; font-weight: 600; }
+.rd { font-size: 22rpx; color: #8a9199; margin-top: 6rpx; }

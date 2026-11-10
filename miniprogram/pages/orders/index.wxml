@@ -1,0 +1,43 @@
+<view class="wrap">
+  <view class="tabs">
+    <view class="tab {{tab === 'orders' ? 'on' : ''}}" data-t="orders" bindtap="switchTab">我的订单</view>
+    <view class="tab {{tab === 'ar' ? 'on' : ''}}" data-t="ar" bindtap="switchTab">对账</view>
+  </view>
+
+  <block wx:if="{{tab === 'orders'}}">
+    <view class="card">
+      <view wx:if="{{!orders.length}}" class="empty">还没有订单</view>
+      <view class="item" wx:for="{{orders}}" wx:key="order_no">
+        <view class="row">
+          <view>
+            <view class="item-title">{{item.order_no}}</view>
+            <view class="item-sub">{{item.store}} · {{item.lines}} 个品项</view>
+          </view>
+          <view style="text-align:right">
+            <view class="money">¥{{item.amountText}}</view>
+            <view class="tag {{item.status === '已回单' ? 'g' : ''}}" style="margin-top:8rpx;">{{item.status}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{tab === 'ar'}}">
+    <view class="card">
+      <view class="card-title">待结账<text class="hint">合计 ¥{{total}}</text></view>
+      <view wx:if="{{!ars.length}}" class="empty">没有待结账的账单</view>
+      <view class="item" wx:for="{{ars}}" wx:key="order_no">
+        <view class="row">
+          <view>
+            <view class="item-title">{{item.order_no}}</view>
+            <view class="item-sub">账期日 {{item.due_date || '—'}}</view>
+          </view>
+          <view style="text-align:right">
+            <view class="money">¥{{item.amountText}}</view>
+            <view class="muted">{{item.status}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

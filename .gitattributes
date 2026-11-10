@@ -1,0 +1,15 @@
+# Windows 上默认会把换行转成 CRLF，这对 Dockerfile 和 .sh 是致命伤
+# （CRLF 的 shell 脚本在 Linux 里会报 "$'\r': command not found"）
+* text=auto
+
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.py        text eol=lf
+
+# 图片和已编译产物不做文本转换
+*.png binary
+*.jpg binary
+*.xlsx binary

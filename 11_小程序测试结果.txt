@@ -1,0 +1,78 @@
+==============================================================================
+微信小程序工程 · 静态检查 + 接口联调  2026-11-10
+==============================================================================
+
+[A] 工程结构
+  [PASS] 存在 app.json
+  [PASS] 存在 app.js
+  [PASS] 存在 app.wxss
+  [PASS] 存在 project.config.json
+  [PASS] 存在 utils/api.js
+  [PASS] 声明了 7 个页面  login、sales、newstore、store、orders、driver、boss
+  [PASS] 每个页面都有 .js 与 .wxml  []
+
+[B] JSON 合法性
+  [PASS] app.json 可解析  5 个键
+  [PASS] project.config.json 可解析  7 个键
+  [PASS] appid 已设置（游客模式 touristappid）  touristappid
+  [PASS] 已关闭域名校验（本地开发用）
+
+[C] WXML 结构
+  [PASS] login                  标签闭合  []
+  [PASS] sales                  标签闭合  []
+  [PASS] newstore               标签闭合  []
+  [PASS] store                  标签闭合  []
+  [PASS] orders                 标签闭合  []
+  [PASS] driver                 标签闭合  []
+  [PASS] boss                   标签闭合  []
+  [PASS] login                  没有 onclick/onchange（小程序用 bindtap）
+  [PASS] sales                  没有 onclick/onchange（小程序用 bindtap）
+  [PASS] newstore               没有 onclick/onchange（小程序用 bindtap）
+  [PASS] store                  没有 onclick/onchange（小程序用 bindtap）
+  [PASS] orders                 没有 onclick/onchange（小程序用 bindtap）
+  [PASS] driver                 没有 onclick/onchange（小程序用 bindtap）
+  [PASS] boss                   没有 onclick/onchange（小程序用 bindtap）
+
+[D] 页面调用的接口服务端都注册了
+  [PASS] 小程序共用到 12 个接口，全部存在  []
+     /api/auth/login、/api/dashboard、/api/deliveries、/api/deliveries/、/api/master/skus、/api/orders、/api/receivables、/api/stores、/api/upload、/api/visits/checkin、/api/visits/kpi、/api/visits/today
+
+[E] 按页面真实调用顺序联调
+
+[E1] 业务员端：今日待访 → 打卡 → KPI
+  [PASS] 今日待访 2 家（自己名下）  姜山老灶火锅、周记烤鱼(万达店)
+  [PASS] 每条带经纬度（地图打点要用）
+  [PASS] 到店打卡：有效（距 14.7 米）  14.7
+  [PASS] 远离门店打卡：记录但判无效  距离 5291 米，超出 200 米围栏
+  [PASS] 定位精度 300 米：判无效  定位精度 300 米，超过 100 米
+  [PASS] 给别家门店打卡 → 403  FORBIDDEN_STORE
+  [PASS] 没有定位 → 400  NO_LOCATION
+  [PASS] 打卡后 S001 进入已访  已访 2 家
+  [PASS] KPI 有拜访数  本月 3 次，有效 1 次
+  [PASS] KPI 按人隔离（sales2 看不到 sales1 的）  0
+
+[E2] 门店端：门店 → 商品 → 下单 → 订单 → 对账
+  [PASS] 门店只见自己 1 家  姜山老灶火锅
+  [PASS] 商品目录 72 个 SKU  72
+  [PASS] 补数据后 3 个 SKU 可下单  ['麻辣红油 ¥8.0', '麻辣火锅底料 ¥9.0', '万州烤鱼酱 ¥8.4']
+  [PASS] 门店看不到成本
+  [PASS] 门店下单成功  SO261110-0001
+  [PASS] 门店订单列表非空  1 单
+  [PASS] 对账页有数据  1 条
+
+[E3] 司机端：配送单 → 签收
+  [PASS] 老板发车  ['DL261110-0101']
+  [PASS] 司机看到本线路配送单  1 单
+  [PASS] 全部 CX-01
+  [PASS] 列表把「配送中」排在前面  配送中
+  [PASS] 签收成功并出账期  2026-12-10
+
+[E4] 老板端：看板
+  [PASS] 看板有订单数与金额  1 单 / ¥192.0
+  [PASS] 看板有毛利率（老板可见）  12.5%
+  [PASS] 业务员看板没有毛利率
+
+==============================================================================
+结果：通过 51 ｜ 失败 0
+==============================================================================
+说明：渲染效果与真机定位需在微信开发者工具里看，本脚本只验证结构与接口。

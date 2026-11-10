@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/sales/index",
+    "pages/newstore/index",
+    "pages/store/index",
+    "pages/orders/index",
+    "pages/driver/index",
+    "pages/boss/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "新平食品",
+    "backgroundColor": "#f4f6f9",
+    "backgroundTextStyle": "light"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于到店打卡，判断是否在门店围栏内"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation"],
+  "style": "v2"
+}

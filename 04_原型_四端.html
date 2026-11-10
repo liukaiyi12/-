@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新平食品 · 系统原型 v1（P0）</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --green:#07C160; --green-d:#06AD56; --ink:#14171a; --sub:#6b7280;
+    --line:#e8ebef; --bg:#f2f4f7; --card:#fff; --warn:#FF8A3D; --blue:#2B7FFF;
+    --orange:#FF9F2E; --red:#F5453E;
+  }
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#e9eef6 0%,#dfe4ec 55%,#d7dce5 100%);
+    color:var(--ink);min-height:100vh;padding:28px 16px 56px;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+  .head{text-align:center;margin-bottom:22px}
+  .head h1{font-size:20px;margin:0 0 6px;letter-spacing:.4px}
+  .head p{margin:0;font-size:12.5px;color:#5b636e;line-height:1.7}
+  .head .badge{display:inline-block;margin-top:10px;font-size:11px;color:#4a5460;background:#fff;
+    border:1px solid #d8dee6;border-radius:999px;padding:3px 10px}
+
+  .tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+  .tab{border:1px solid #dfe4eb;background:#fff;color:#4b5563;font-size:13px;padding:9px 16px;
+    border-radius:10px;cursor:pointer;transition:.16s;font-family:inherit}
+  .tab:hover{border-color:#c3ccd8}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 6px 16px rgba(20,23,26,.18)}
+
+  .stage{display:flex;justify-content:center}
+  .phone{
+    width:375px;height:760px;background:var(--bg);border-radius:40px;position:relative;
+    box-shadow:0 24px 60px rgba(24,32,44,.22),0 2px 0 #fff inset,0 0 0 10px #17191c,0 0 0 11px #2c3036;
+    overflow:hidden;display:none;flex-direction:column;
+  }
+  .phone.on{display:flex}
+  .statusbar{height:40px;flex:0 0 40px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px;font-size:12.5px;font-weight:600;color:#111;background:transparent}
+  .notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:96px;height:22px;
+    background:#17191c;border-radius:0 0 14px 14px;z-index:5}
+
+  .screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 14px 14px}
+  .screen::-webkit-scrollbar{width:0}
+
+  .appbar{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px}
+  .appbar .t{font-size:17px;font-weight:700}
+  .appbar .s{font-size:11.5px;color:var(--sub);margin-top:2px;font-weight:400}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ffd479,#ff9f43);
+    display:grid;place-items:center;font-size:12px;font-weight:700;color:#7a4a00}
+
+  .card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(17,24,39,.05)}
+  .lbl{font-size:11.5px;color:var(--sub);letter-spacing:.2px}
+  .big{font-size:22px;font-weight:750;letter-spacing:-.3px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .divider{height:1px;background:var(--line);margin:10px -14px}
+
+  /* 进度三格 */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:6px}
+  .stats .v{font-size:19px;font-weight:750}
+  .stats .k{font-size:11px;color:var(--sub);margin-top:3px}
+  .stats .v small{font-size:11px;color:var(--sub);font-weight:500}
+
+  /* 地图 */
+  .map{position:relative;height:150px;border-radius:14px;overflow:hidden;
+    background:#eaf0e6;
+    background-image:
+      linear-gradient(#dde4e9 1px,transparent 1px),
+      linear-gradient(90deg,#dde4e9 1px,transparent 1px);
+    background-size:26px 26px;margin-bottom:12px}
+  .map .water{position:absolute;right:-10px;top:-10px;width:110px;height:190px;background:#d6e6f2;
+    transform:rotate(14deg);border-radius:24px}
+  .map .park{position:absolute;left:12px;bottom:10px;width:74px;height:46px;background:#dcecd4;border-radius:8px}
+  .pin{position:absolute;width:15px;height:15px;border-radius:50%;border:3px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .pin.done{background:var(--green)}
+  .pin.todo{background:var(--orange)}
+  .pin.next{background:var(--red);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,69,62,.55)}70%{box-shadow:0 0 0 12px rgba(245,69,62,0)}100%{box-shadow:0 0 0 0 rgba(245,69,62,0)}}
+  .map .tip{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.94);border-radius:8px;
+    font-size:10.5px;padding:5px 8px;color:#33413a;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+  /* 任务列表 */
+  .task{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+  .task:last-child{border-bottom:none}
+  .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px}
+  .task .nm{font-size:13.5px;font-weight:650}
+  .task .ad{font-size:11.5px;color:var(--sub);margin-top:3px;line-height:1.5}
+  .tag{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:650;white-space:nowrap}
+  .tag.g{background:#e6f7ee;color:#06874a}
+  .tag.o{background:#fff1e3;color:#b45c00}
+  .tag.b{background:#e8f0ff;color:#1b5fd0}
+
+  /* 主按钮 */
+  .cta{display:block;width:100%;border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:700;
+    color:#fff;background:var(--green);cursor:pointer;font-family:inherit;letter-spacing:.5px;
+    box-shadow:0 8px 20px rgba(7,193,96,.32)}
+  .cta:active{transform:translateY(1px)}
+  .cta small{display:block;font-size:10.5px;font-weight:400;opacity:.86;margin-top:3px;letter-spacing:0}
+  .cta.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .cta.dark{background:var(--ink);box-shadow:0 8px 20px rgba(20,23,26,.22)}
+  .gps{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px;font-size:11px;color:#5b636e}
+  .gps i{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;
+    box-shadow:0 0 0 3px rgba(7,193,96,.18)}
+
+  /* 底部 tabbar */
+  .tabbar{flex:0 0 58px;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:6px}
+  .tabbar div{flex:1;display:grid;place-items:center;font-size:10.5px;color:#9aa2ac;gap:2px;padding-top:7px}
+  .tabbar div.on{color:var(--green);font-weight:700}
+  .tabbar span{font-size:17px;line-height:1}
+
+  /* 门店端 */
+  .search{display:flex;align-items:center;gap:8px;background:#eef1f5;border-radius:12px;padding:10px 12px;
+    font-size:12.5px;color:#9aa2ac;margin-bottom:12px}
+  .goods{display:flex;gap:11px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+  .goods:last-child{border-bottom:none}
+  .thumb{width:52px;height:52px;border-radius:11px;flex:0 0 52px;display:grid;place-items:center;
+    font-size:10px;font-weight:700;color:#7a5410;text-align:center;line-height:1.25;padding:2px}
+  .t1{background:linear-gradient(160deg,#ffe3b0,#ffc978)}
+  .t2{background:linear-gradient(160deg,#ffd0d0,#ffa7a7)}
+  .t3{background:linear-gradient(160deg,#d6e4ff,#a9c6ff)}
+  .t4{background:linear-gradient(160deg,#d8f5e3,#a6e3c1)}
+  .goods .nm{font-size:13px;font-weight:650}
+  .goods .sp{font-size:11px;color:var(--sub);margin-top:3px}
+  .goods .pr{font-size:13.5px;font-weight:750;color:#c0392b;margin-top:4px}
+  .stp{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .stp b{width:26px;height:26px;border-radius:50%;background:#f2f4f7;display:grid;place-items:center;
+    font-weight:700;color:#5b636e;font-size:15px;user-select:none}
+  .stp .n{min-width:14px;text-align:center;font-size:13px;font-weight:700}
+  .bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
+    margin:0 -14px -14px;padding:12px 14px}
+
+  /* 司机端 */
+  .prog{height:8px;background:#e9edf2;border-radius:999px;overflow:hidden;margin:10px 0 6px}
+  .prog i{display:block;height:100%;width:58%;background:linear-gradient(90deg,#07C160,#5ede9c);border-radius:999px}
+  .nextcard{border:1.5px solid var(--green);border-radius:16px;padding:14px;background:#f4fdf8;margin-bottom:12px}
+  .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;color:#374151}
+  .kv b{font-weight:700}
+  .twobtn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .twobtn button{border:none;border-radius:12px;padding:12px;font-size:13.5px;font-weight:700;
+    font-family:inherit;cursor:pointer}
+  .twobtn .a{background:#e8f0ff;color:#1b5fd0}
+  .twobtn .b{background:var(--green);color:#fff}
+  .sent{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:9px 0;
+    border-bottom:1px dashed var(--line);color:#4b5563}
+  .sent:last-child{border-bottom:none}
+  .ok{color:#06874a;font-weight:700;font-size:11.5px}
+
+  /* 老板端 */
+  .kpi4{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .kpi{background:#fff;border-radius:15px;padding:13px 13px 12px;box-shadow:0 1px 2px rgba(17,24,39,.05)}
+  .kpi .k{font-size:11px;color:var(--sub)}
+  .kpi .v{font-size:20px;font-weight:750;margin-top:5px;letter-spacing:-.4px}
+  .kpi .d{font-size:10.5px;margin-top:4px;color:#06874a;font-weight:600}
+  .kpi .d.down{color:var(--red)}
+  .chart{display:flex;align-items:flex-end;gap:8px;height:86px;margin-top:10px}
+  .chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+  .chart .bx{width:100%;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#9fd4ff,#5aa9ff)}
+  .chart .col.now .bx{background:linear-gradient(180deg,#5ede9c,#07C160)}
+  .chart .d{font-size:9.5px;color:#9aa2ac}
+  .advice{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.55}
+  .advice:last-child{border-bottom:none}
+  .advice .ic{flex:0 0 22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;
+    background:#fff4e5;color:#b45c00;font-weight:800}
+  .advice b{font-weight:700}
+  .rank{display:flex;justify-content:space-between;font-size:12.5px;padding:8px 0;color:#374151}
+
+  .foot{max-width:980px;margin:22px auto 0;text-align:center;font-size:11.5px;color:#5b636e;line-height:1.8}
+  @media(max-width:460px){
+    body{padding:16px 8px 40px}
+    .phone{transform:scale(.86);transform-origin:top center;margin-bottom:-100px}
+  }
+</style>
+</head>
+<body>
+<style>
+  #stale{position:fixed;left:0;right:0;top:0;z-index:999;background:#fff4e5;border-bottom:1px solid #f5d9a8;
+    color:#8a5a00;font-size:12.5px;padding:9px 14px;text-align:center;line-height:1.6;
+    font-family:-apple-system,"Microsoft YaHei",sans-serif}
+  #stale b{color:#c0392b}
+  body{padding-top:46px}
+</style>
+<div id="stale">
+  <b>这是一份早期的线框草稿，已被真实页面取代。</b>
+  现在能跑的是：主控台 <code>http://127.0.0.1:8765/</code>、门店端 <code>/store</code>、司机端 <code>/driver</code>、微信小程序 <code>miniprogram/</code>。
+  本文件仅作"当初怎么想的"留档。
+</div>
+<div class="wrap">
+  <div class="head">
+    <h1>新平食品（宁波洪晟）· 供应链协同系统原型</h1>
+    <p>P0 线框原型 · 四端流程对齐用｜点上方按钮切换身份｜数据为示例，仅用于确认流程与字段</p>
+    <span class="badge">v1 · 2026-11 · 对应《01 商品主数据表》72 个 SKU</span>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-go="p1">① 业务员（打卡/任务）</button>
+    <button class="tab" data-go="p2">② 门店（订货）</button>
+    <button class="tab" data-go="p3">③ 司机（配送/签收）</button>
+    <button class="tab" data-go="p4">④ 老板（看板/建议）</button>
+  </div>
+
+  <div class="stage">
+
+    <!-- ============ 1 业务员 ============ -->
+    <div class="phone on" id="p1">
+      <div class="notch"></div>
+      <div class="statusbar"><span>13:37</span><span>4G ▮▮▮ 86%</span></div>
+      <div class="screen">
+        <div class="appbar">
+          <div>
+            <div class="t">今日 · 周三</div>
+            <div class="s">城西片区 · 张伟</div>
+          </div>
+          <div class="avatar">张</div>
+        </div>
+
+        <div class="card">
+          <div class="stats">
+            <div><div class="v">4<small>/8</small></div><div class="k">已拜访</div></div>
+            <div><div class="v">3</div><div class="k">有效拜访</div></div>
+            <div><div class="v">1</div><div class="k">新增门店</div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="row" style="font-size:11.5px;color:var(--sub)">
+            <span>本周任务：扫街 40 家（已完成 23）</span><span style="color:var(--green);font-weight:700">57%</span>
+          </div>
+        </div>
+
+        <div class="map">
+          <div class="water"></div><div class="park"></div>
+          <div class="tip">城西商圈 · 8 家待访</div>
+          <div class="pin done" style="left:70px;top:52px"></div>
+          <div class="pin done" style="left:150px;top:96px"></div>
+          <div class="pin done" style="left:96px;top:120px"></div>
+          <div class="pin next" style="left:228px;top:66px"></div>
+          <div class="pin todo" style="left:196px;top:120px"></div>
+          <div class="pin todo" style="left:286px;top:110px"></div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:4px">
+            <span style="font-size:13px;font-weight:750">今日路线（自动排序）</span>
+            <span class="lbl">共 8 家 · 剩余 4 家</span>
+          </div>
+          <div class="task">
+            <span class="dot" style="background:var(--green)"></span>
+            <div style="flex:1">
+              <div class="nm">姜山老灶火锅</div>
+              <div class="ad">09:41 到店 · 停留 26 分钟 · 试菜已约</div>
+            </div>
+            <span class="tag g">已拜访</span>
+          </div>
+          <div class="task">
+            <span class="dot" style="background:var(--red)"></span>
+            <div style="flex:1">
+              <div class="nm">周记烤鱼（万达店）</div>
+              <div class="ad">距您 320m · 上次拜访 12 天前 · 竞品：李锦记</div>
+            </div>
+            <span class="tag b">下一站</span>
+          </div>
+          <div class="task">
+            <span class="dot" style="background:var(--orange)"></span>
+            <div style="flex:1">
+              <div class="nm">川味小厨</div>
+              <div class="ad">距您 1.1km · 未建档 · 大众点评评分 4.6</div>
+            </div>
+            <span class="tag o">待拜访</span>
+          </div>
+        </div>
+
+        <button class="cta">到 店 打 卡
+          <small>GPS 已定位 · 精度 12m · 距目标 320m</small>
+        </button>
+        <div class="gps"><i></i> 围栏内打卡自动通过；超 200m 需拍照说明</div>
+      </div>
+      <div class="tabbar">
+        <div class="on"><span>◎</span>首页</div>
+        <div><span>☰</span>任务</div>
+        <div><span>◈</span>门店</div>
+        <div><span>☺</span>我的</div>
+      </div>
+    </div>
+
+    <!-- ============ 2 门店 ============ -->
+    <div class="phone" id="p2">
+      <div class="notch"></div>
+      <div class="statusbar"><span>13:37</span><span>4G ▮▮▮ 86%</span></div>
+      <div class="screen">
+        <div class="appbar">
+          <div>
+            <div class="t">姜山老灶火锅</div>
+            <div class="s">账期 月结30 · 额度剩余 ¥12,000</div>
+          </div>
+          <div class="avatar" style="background:linear-gradient(135deg,#a9c6ff,#2B7FFF);color:#fff">店</div>
+        </div>
+
+        <div class="search">🔍 搜索品名（如：烤鱼酱 / 火锅底料）</div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:2px">
+            <span style="font-size:13px;font-weight:750">常购清单</span>
+            <span class="lbl">按上次订购排序</span>
+          </div>
+
+          <div class="goods">
+            <div class="thumb t1">烤鱼<br>酱</div>
+            <div style="flex:1">
+              <div class="nm">万州烤鱼酱 1kg/袋</div>
+              <div class="sp">20 袋/箱 · 保质期 12 个月</div>
+              <div class="pr">¥168 <span style="font-size:10.5px;color:#9aa2ac;font-weight:500">/箱</span></div>
+            </div>
+            <div class="stp"><b>−</b><span class="n">2</span><b>+</b></div>
+          </div>
+
+          <div class="goods">
+            <div class="thumb t2">火锅<br>底料</div>
+            <div style="flex:1">
+              <div class="nm">麻辣火锅底料 1kg/袋</div>
+              <div class="sp">20 袋/箱 · 保质期 12 个月</div>
+              <div class="pr">¥180 <span style="font-size:10.5px;color:#9aa2ac;font-weight:500">/箱</span></div>
+            </div>
+            <div class="stp"><b>−</b><span class="n">3</span><b>+</b></div>
+          </div>
+
+          <div class="goods">
+            <div class="thumb t3">麻辣<br>红油</div>
+            <div style="flex:1">
+              <div class="nm">麻辣红油 1kg/袋</div>
+              <div class="sp">12 袋/箱 · 保质期 9 个月</div>
+              <div class="pr">¥96 <span style="font-size:10.5px;color:#9aa2ac;font-weight:500">/箱</span></div>
+            </div>
+            <div class="stp"><b>−</b><span class="n">1</span><b>+</b></div>
+          </div>
+
+          <div class="goods">
+            <div class="thumb t4">油泼<br>辣子</div>
+            <div style="flex:1">
+              <div class="nm">香辣油泼辣子 1kg/袋</div>
+              <div class="sp">12 袋/箱 · 保质期 12 个月</div>
+              <div class="pr">¥88 <span style="font-size:10.5px;color:#9aa2ac;font-weight:500">/箱</span></div>
+            </div>
+            <div class="stp"><b>−</b><span class="n">0</span><b>+</b></div>
+          </div>
+        </div>
+
+        <div class="card" style="background:#fff8ec;border:1px solid #ffe2b8">
+          <div style="font-size:12px;line-height:1.7;color:#8a5a00">
+            <b>起订提醒：</b>本单 6 箱，已达最低起送 5 箱。<br>
+            满 10 箱免运费（现 ¥15）。
+          </div>
+        </div>
+
+        <div class="bar">
+          <div class="row" style="margin-bottom:10px">
+            <span class="lbl">合计 6 箱</span>
+            <span style="font-size:19px;font-weight:750;color:#c0392b">¥1,032</span>
+          </div>
+          <button class="cta">提 交 订 单<small>预计 周五（11-13）送达 · 配送日：周五</small></button>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="on"><span>◎</span>订货</div>
+        <div><span>☰</span>订单</div>
+        <div><span>◈</span>对账</div>
+        <div><span>☺</span>我的</div>
+      </div>
+    </div>
+
+    <!-- ============ 3 司机 ============ -->
+    <div class="phone" id="p3">
+      <div class="notch"></div>
+      <div class="statusbar"><span>13:37</span><span>4G ▮▮▮ 86%</span></div>
+      <div class="screen">
+        <div class="appbar">
+          <div>
+            <div class="t">城西 03 线</div>
+            <div class="s">浙B·5S27 · 司机 王强 · 常温车</div>
+          </div>
+          <div class="avatar" style="background:linear-gradient(135deg,#b8f0cf,#07C160);color:#053d22">王</div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <span style="font-size:13px;font-weight:750">今日 12 单</span>
+            <span class="lbl">已签收 <b style="color:#06874a">7</b> · 剩余 5</span>
+          </div>
+          <div class="prog"><i></i></div>
+          <div class="row lbl"><span>出车 08:20 · 预计 16:40 收车</span><span>准时率 100%</span></div>
+        </div>
+
+        <div class="nextcard">
+          <div class="row" style="margin-bottom:8px">
+            <span style="font-size:11px;font-weight:750;color:#06874a;letter-spacing:.5px">下一站 · 第 8 单</span>
+            <span class="tag g">距离 3.2km</span>
+          </div>
+          <div style="font-size:15px;font-weight:750;margin-bottom:8px">姜山老灶火锅</div>
+          <div class="kv"><span>地址</span><b style="text-align:right;font-weight:600">江北区慈城镇普济路 18 号</b></div>
+          <div class="kv"><span>联系人</span><b>李老板 138****6021</b></div>
+          <div class="kv"><span>货品</span><b>6 箱（烤鱼酱×2 火锅底料×3 红油×1）</b></div>
+          <div class="kv" style="border-top:1px dashed #cdebd8;margin-top:6px;padding-top:10px">
+            <span>代收货款</span><b style="color:#c0392b;font-size:15px">¥1,032</b>
+          </div>
+          <div class="twobtn">
+            <button class="a">导航前往</button>
+            <button class="b">到达 · 签收</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:4px">
+            <span style="font-size:13px;font-weight:750">已完成</span>
+            <span class="lbl">回单 7/7 张</span>
+          </div>
+          <div class="sent"><span>川味小厨 · 4 箱</span><span class="ok">已签收 12:06</span></div>
+          <div class="sent"><span>老四烧烤 · 3 箱</span><span class="ok">已签收 11:32</span></div>
+          <div class="sent"><span>刘记麻辣烫 · 8 箱</span><span class="ok">已签收 10:48</span></div>
+        </div>
+
+        <button class="cta ghost" style="color:#c0392b;border-color:#f5c6c4">异常上报（拒收/少货/关门）</button>
+      </div>
+      <div class="tabbar">
+        <div class="on"><span>◎</span>今日</div>
+        <div><span>☰</span>线路</div>
+        <div><span>◈</span>回单</div>
+        <div><span>☺</span>我的</div>
+      </div>
+    </div>
+
+    <!-- ============ 4 老板 ============ -->
+    <div class="phone" id="p4">
+      <div class="notch"></div>
+      <div class="statusbar"><span>13:37</span><span>4G ▮▮▮ 86%</span></div>
+      <div class="screen">
+        <div class="appbar">
+          <div>
+            <div class="t">经营看板</div>
+            <div class="s">11 月 10 日 · 实时</div>
+          </div>
+          <div class="avatar" style="background:linear-gradient(135deg,#2c3036,#14171a);color:#fff">洪</div>
+        </div>
+
+        <div class="kpi4">
+          <div class="kpi"><div class="k">今日订单</div><div class="v">38<span style="font-size:12px;font-weight:500"> 单</span></div>
+            <div class="d">↑ 12% 环比昨日</div></div>
+          <div class="kpi"><div class="k">发货金额</div><div class="v">4.29<span style="font-size:12px;font-weight:500"> 万</span></div>
+            <div class="d">↑ 8.4%</div></div>
+          <div class="kpi"><div class="k">今日回款</div><div class="v">1.82<span style="font-size:12px;font-weight:500"> 万</span></div>
+            <div class="d">逾期 ¥6,400</div></div>
+          <div class="kpi"><div class="k">毛利率</div><div class="v">31.2<span style="font-size:12px;font-weight:500"> %</span></div>
+            <div class="d down">↓ 1.6pt（红油成本涨）</div></div>
+        </div>
+
+        <div class="card">
+          <div class="row"><span style="font-size:13px;font-weight:750">近 7 日发货额</span>
+            <span class="lbl">总 ¥28.4 万</span></div>
+          <div class="chart">
+            <div class="col"><div class="bx" style="height:44%"></div><div class="d">4日</div></div>
+            <div class="col"><div class="bx" style="height:52%"></div><div class="d">5日</div></div>
+            <div class="col"><div class="bx" style="height:38%"></div><div class="d">6日</div></div>
+            <div class="col"><div class="bx" style="height:66%"></div><div class="d">7日</div></div>
+            <div class="col"><div class="bx" style="height:58%"></div><div class="d">8日</div></div>
+            <div class="col"><div class="bx" style="height:72%"></div><div class="d">9日</div></div>
+            <div class="col now"><div class="bx" style="height:88%"></div><div class="d">今日</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:2px">
+            <span style="font-size:13px;font-weight:750">今天该干什么</span>
+            <span class="lbl">规则建议 · 3 条</span>
+          </div>
+          <div class="advice"><div class="ic">!</div>
+            <div><b>3 家门店 45 天未复购</b>（周记烤鱼、川味小厨、老四烧烤），
+              建议派给城西业务员本周回访。</div></div>
+          <div class="advice"><div class="ic">¥</div>
+            <div><b>烤鱼系列城西动销最好</b>（占该区 42%），建议把下周扫街任务压到城西商圈。</div></div>
+          <div class="advice"><div class="ic">▤</div>
+            <div><b>麻辣红油临期 320 袋</b>（11-28 到期），建议打包给 B 类客户做搭赠。</div></div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:6px">
+            <span style="font-size:13px;font-weight:750">业务员排名（本月）</span>
+            <span class="lbl">看排名</span>
+          </div>
+          <div class="rank"><span>1. 张伟 · 城西</span><b>¥86,400</b></div>
+          <div class="rank"><span>2. 陈丽 · 城东</span><b>¥71,200</b></div>
+          <div class="rank"><span>3. 王强 · 城南</span><b>¥58,900</b></div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="on"><span>◎</span>看板</div>
+        <div><span>☰</span>销售</div>
+        <div><span>◈</span>库存</div>
+        <div><span>☺</span>我的</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    原型范围：只画"能点的主路径"，不含审批流、异常处理、设置页。<br>
+    待工厂确认后（见《03 待确认清单》33 项）再出高保真与字段级说明。
+  </div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const phones = document.querySelectorAll('.phone');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('on'));
+    phones.forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById(t.dataset.go).classList.add('on');
+    document.querySelector('.stage').scrollIntoView({behavior:'smooth', block:'center'});
+  }));
+</script>
+</body>
+</html>

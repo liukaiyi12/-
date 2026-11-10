@@ -1,0 +1,44 @@
+<view class="wrap" style="padding-bottom:200rpx">
+  <view class="card">
+    <view class="row">
+      <view>
+        <view style="font-size:34rpx;font-weight:700;">{{store.name}}</view>
+        <view class="muted">{{store.region}} · 账期 {{store.settle}} · 额度 ¥{{store.credit_limit}}</view>
+      </view>
+      <view class="tag" bindtap="logout">退出</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">常购清单<text class="hint">按箱订</text></view>
+    <view wx:if="{{!skus.length}}" class="empty">还没有可订的商品（工厂未补箱规与价格）</view>
+    <view class="item" wx:for="{{skus}}" wx:key="sku_code">
+      <view class="row">
+        <view style="flex:1">
+          <view class="item-title">{{item.name}}</view>
+          <view class="item-sub">{{item.units_per_carton}} 袋/箱 · 保质期 {{item.shelf_life_month}} 个月</view>
+          <view class="money" style="margin-top:8rpx;">¥{{item.priceText}}<text class="muted"> /箱</text></view>
+        </view>
+        <view class="stepper">
+          <view class="sb" data-i="{{index}}" data-d="-1" bindtap="step">−</view>
+          <view class="sn">{{item.qty}}</view>
+          <view class="sb" data-i="{{index}}" data-d="1" bindtap="step">+</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{cartons > 0}}">
+    <view class="muted">本单 {{cartons}} 箱，提交后由工厂确认并排产</view>
+  </view>
+</view>
+
+<view class="bottom">
+  <view style="flex:1">
+    <view class="muted">合计 {{cartons}} 箱</view>
+    <view class="money" style="font-size:38rpx;">¥{{amount}}</view>
+  </view>
+  <button class="btn" style="width:240rpx" bindtap="submit" disabled="{{cartons === 0}}">
+    {{loading ? '提交中' : '提交订单'}}
+  </button>
+</view>

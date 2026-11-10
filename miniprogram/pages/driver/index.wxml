@@ -1,0 +1,72 @@
+<view class="wrap">
+  <view class="card">
+    <view class="row">
+      <view>
+        <view style="font-size:34rpx;font-weight:700;">线路 {{user.route_code}}</view>
+        <view class="muted">{{user.name}} · 常温车</view>
+      </view>
+      <view class="tag" bindtap="logout">退出</view>
+    </view>
+    <view class="kpis" style="margin-top:24rpx;margin-bottom:0">
+      <view class="kpi"><view class="v">{{items.length}}</view><view class="k">今日单</view></view>
+      <view class="kpi"><view class="v">{{signed.length}}</view><view class="k">已签收</view></view>
+      <view class="kpi"><view class="v">¥{{amount}}</view><view class="k">代收货款</view></view>
+    </view>
+    <view class="bar"><view class="bar-in" style="width:{{pct}}%"></view></view>
+    <view class="muted" style="margin-top:10rpx">已签收 {{signed.length}}/{{items.length}}（{{pct}}%）</view>
+  </view>
+
+  <view class="next" wx:if="{{next}}">
+    <view class="row">
+      <text class="tag g">下一站</text>
+      <text class="muted">剩 {{pending.length}} 站</text>
+    </view>
+    <view class="next-name">{{next.store}}</view>
+    <view class="kv"><text>地址</text><text class="kv-r">{{next.address}}</text></view>
+    <view class="kv"><text>订单</text><text class="kv-r">{{next.order_no}}（{{next.lines}} 个品项）</text></view>
+    <view class="kv"><text>配送单</text><text class="kv-r">{{next.delivery_no}}</text></view>
+    <view class="kv money-row"><text>代收货款</text><text class="money" style="font-size:34rpx;">¥{{next.amount}}</text></view>
+    <view class="ops">
+      <button class="btn ghost" bindtap="nav">导航前往</button>
+      <button class="btn" bindtap="sign" disabled="{{loading}}">到达 · 签收</button>
+    </view>
+  </view>
+
+  <view class="card" wx:else>
+    <view class="empty">全部送完了，可以收车</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">待送<text class="hint">{{pending.length}} 单</text></view>
+    <view wx:if="{{!pending.length}}" class="empty">没有待送的单</view>
+    <view class="item" wx:for="{{pending}}" wx:key="delivery_no">
+      <view class="row">
+        <view>
+          <view class="item-title">{{item.store}}</view>
+          <view class="item-sub">{{item.delivery_no}}</view>
+        </view>
+        <view style="text-align:right">
+          <view class="tag o">{{index === 0 ? '下一站' : '待送'}}</view>
+          <view class="muted" style="margin-top:6rpx;">¥{{item.amount}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{signed.length}}">
+    <view class="card-title">已送达<text class="hint">{{signed.length}} 单</text></view>
+    <view class="item" wx:for="{{signed}}" wx:key="delivery_no">
+      <view class="row">
+        <view>
+          <view class="item-title">{{item.store}}</view>
+          <view class="item-sub">签收人 {{item.receiver || '—'}}</view>
+        </view>
+        <view class="tag g">已签收</view>
+      </view>
+    </view>
+  </view>
+
+  <button class="btn ghost" style="color:#c0392b;border-color:#f5c6c4" bindtap="report">
+    异常上报（拒收 / 少货 / 关门）
+  </button>
+</view>

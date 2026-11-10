@@ -1,0 +1,13 @@
+.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 10rpx; }
+
+.step {
+  background: #f4f6f9;
+  color: #6b7280;
+  border-radius: 10rpx;
+  padding: 8rpx 16rpx;
+  font-size: 22rpx;
+}
+
+.step.on { background: #e6f7ee; color: #06874a; font-weight: 600; }
+
+.arrow { color: #c3ccd8; font-size: 22rpx; }

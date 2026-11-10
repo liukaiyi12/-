@@ -1,0 +1,59 @@
+<view class="wrap">
+  <view class="card">
+    <view class="row">
+      <view>
+        <view style="font-size:34rpx;font-weight:700;">{{user.name}}</view>
+        <view class="muted">{{user.region}} · {{user.role_cn}}</view>
+      </view>
+      <view class="tag g" bindtap="logout">退出</view>
+    </view>
+  </view>
+
+  <view class="kpis">
+    <view class="kpi"><view class="v">{{stats.done}}/{{stats.total}}</view><view class="k">今日已访</view></view>
+    <view class="kpi"><view class="v">{{kpi.valid || 0}}</view><view class="k">本月有效</view></view>
+    <view class="kpi"><view class="v">{{kpi.new_stores || 0}}</view><view class="k">本月新客</view></view>
+  </view>
+
+  <view class="card" wx:if="{{markers.length}}">
+    <view class="card-title">门店地图<text class="hint">{{markers.length}} 家待访</text></view>
+    <map class="map" longitude="{{center.lng}}" latitude="{{center.lat}}"
+         scale="13" markers="{{markers}}" show-location></map>
+  </view>
+
+  <view class="card">
+    <view class="card-title">今日待访<text class="hint">{{stats.left}} 家</text></view>
+    <view wx:if="{{!todo.length}}" class="empty">今天要跑的门店都拜访完了</view>
+    <view class="item" wx:for="{{todo}}" wx:key="id">
+      <view class="row">
+        <view style="flex:1">
+          <view class="item-title">{{item.name}}</view>
+          <view class="item-sub">{{item.address}}</view>
+        </view>
+        <view class="btn-sm" data-id="{{item.id}}" bindtap="checkin">
+          {{loading ? '定位中' : '打卡'}}
+        </view>
+      </view>
+    </view>
+    <view style="margin-top:20rpx">
+      <view class="btn-sm ghost" bindtap="goNewStore">+ 遇到新店，就地建档</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{done.length}}">
+    <view class="card-title">今日已访<text class="hint">{{done.length}} 家</text></view>
+    <view class="item" wx:for="{{done}}" wx:key="id">
+      <view class="row">
+        <view class="item-title">{{item.name}}</view>
+        <view class="tag g">已打卡</view>
+      </view>
+      <view class="item-sub">{{item.address}}</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{lastMsg}}">
+    <view class="muted">{{lastMsg}}</view>
+  </view>
+
+  <button class="btn ghost" bindtap="goOrders">看我的订单</button>
+</view>

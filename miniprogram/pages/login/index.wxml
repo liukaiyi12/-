@@ -1,0 +1,20 @@
+<view class="login">
+  <view class="brand">新平食品</view>
+  <view class="sub">调味品供应链 · 业务协同</view>
+
+  <view class="box">
+    <input class="input" value="{{username}}" bindinput="onUser" placeholder="账号" />
+    <input class="input" value="{{password}}" bindinput="onPwd" password placeholder="密码" />
+    <button class="btn" bindtap="login" disabled="{{loading}}">
+      {{loading ? '登录中…' : '登录'}}
+    </button>
+    <view class="muted tip">演示账号密码都是 demo1234，点下面任意一个直接进</view>
+    <view class="roles">
+      <view class="role" wx:for="{{roles}}" wx:key="u"
+            data-u="{{item.u}}" bindtap="quick">
+        <view class="rn">{{item.n}}</view>
+        <view class="rd">{{item.d}}</view>
+      </view>
+    </view>
+  </view>
+</view>

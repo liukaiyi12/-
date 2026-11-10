@@ -1,0 +1,29 @@
+.stepper { display: flex; align-items: center; gap: 14rpx; }
+
+.sb {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #f2f4f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5b636e;
+}
+
+.sn { min-width: 36rpx; text-align: center; font-weight: 700; }
+
+.bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-top: 1rpx solid #e9ecf1;
+  padding: 20rpx 28rpx 34rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}

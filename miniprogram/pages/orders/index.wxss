@@ -1,0 +1,14 @@
+.tabs { display: flex; gap: 16rpx; margin-bottom: 24rpx; }
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 14rpx;
+  background: #fff;
+  font-size: 26rpx;
+  color: #4b5563;
+  border: 1rpx solid #e9ecf1;
+}
+
+.tab.on { background: #14171a; color: #fff; border-color: #14171a; }

@@ -1,0 +1,115 @@
+page {
+  background: #f4f6f9;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #14171a;
+  font-size: 28rpx;
+}
+
+.wrap { padding: 24rpx; }
+
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 6rpx rgba(17, 24, 39, .05);
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hint { font-size: 22rpx; color: #8a9199; font-weight: 400; }
+
+.row { display: flex; align-items: center; justify-content: space-between; }
+
+.btn {
+  background: #07C160;
+  color: #fff;
+  border-radius: 16rpx;
+  padding: 18rpx 0;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.btn::after { border: none; }
+
+.btn.ghost {
+  background: #fff;
+  color: #14171a;
+  border: 1rpx solid #e6e9ee;
+}
+
+.btn.dark { background: #14171a; }
+
+.btn[disabled] { background: #cfd6de; color: #fff; }
+
+.btn-sm {
+  display: inline-block;
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: #07C160;
+  color: #fff;
+}
+
+.btn-sm.ghost { background: #fff; color: #4b5563; border: 1rpx solid #e6e9ee; }
+
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  background: #eef4ff;
+  color: #1b5fd0;
+  font-weight: 600;
+}
+
+.tag.g { background: #e6f7ee; color: #06874a; }
+.tag.o { background: #fff1e3; color: #b45c00; }
+.tag.r { background: #fdecec; color: #c0392b; }
+
+.muted { color: #8a9199; font-size: 24rpx; }
+
+.item {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #f0f2f5;
+}
+
+.item:last-child { border-bottom: none; }
+
+.item-title { font-size: 28rpx; font-weight: 600; }
+.item-sub { font-size: 22rpx; color: #8a9199; margin-top: 8rpx; }
+
+.money { color: #c0392b; font-weight: 700; }
+
+.kpis { display: flex; gap: 16rpx; margin-bottom: 24rpx; }
+
+.kpi {
+  flex: 1;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 22rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 6rpx rgba(17, 24, 39, .05);
+}
+
+.kpi .v { font-size: 40rpx; font-weight: 700; }
+.kpi .k { font-size: 22rpx; color: #8a9199; margin-top: 6rpx; }
+
+.empty { text-align: center; color: #9aa2ac; font-size: 26rpx; padding: 60rpx 0; }
+
+.input {
+  background: #f4f6f9;
+  border-radius: 14rpx;
+  padding: 22rpx;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+}

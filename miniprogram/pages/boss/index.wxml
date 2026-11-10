@@ -1,0 +1,52 @@
+<view class="wrap">
+  <view class="card">
+    <view class="row">
+      <view>
+        <view style="font-size:34rpx;font-weight:700;">经营看板</view>
+        <view class="muted">{{user.name}} · {{user.role_cn}}</view>
+      </view>
+      <view class="tag" bindtap="logout">退出</view>
+    </view>
+  </view>
+
+  <view class="kpis">
+    <view class="kpi"><view class="v">{{d.orders}}</view><view class="k">订单数</view></view>
+    <view class="kpi"><view class="v">¥{{d.amount}}</view><view class="k">订单金额</view></view>
+  </view>
+  <view class="kpis">
+    <view class="kpi"><view class="v">¥{{d.ar}}</view><view class="k">应收占用</view></view>
+    <view class="kpi" wx:if="{{hasCost}}"><view class="v">{{d.margin}}%</view><view class="k">毛利率</view></view>
+    <view class="kpi" wx:else><view class="v">—</view><view class="k">毛利率（无权限）</view></view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">订单状态</view>
+    <view class="flow">
+      <block wx:for="{{flow}}" wx:key="s">
+        <view class="step {{item.n ? 'on' : ''}}">{{item.s}} {{item.n}}</view>
+        <view class="arrow" wx:if="{{index < 3}}">→</view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">最近订单<text class="hint">按数据范围过滤</text></view>
+    <view wx:if="{{!orders.length}}" class="empty">还没有订单</view>
+    <view class="item" wx:for="{{orders}}" wx:key="order_no">
+      <view class="row">
+        <view>
+          <view class="item-title">{{item.store}}</view>
+          <view class="item-sub">{{item.order_no}}</view>
+        </view>
+        <view style="text-align:right">
+          <view class="money">¥{{item.amountText}}</view>
+          <view class="tag {{item.status === '已回单' ? 'g' : ''}}" style="margin-top:6rpx;">{{item.status}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="muted">换线矩阵、排产对比、审计日志这些是坐在电脑前看的，留在主控台：{{user.name}} 可在浏览器打开 /</view>
+  </view>
+</view>

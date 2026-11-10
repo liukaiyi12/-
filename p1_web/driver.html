@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>配送 · 新平食品</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--ink:#14171a;--sub:#6b7280;--line:#e9ecf1;--bg:#f4f6f9;--green:#07C160;--green-d:#06AD56;
+    --red:#e5484d;--blue:#2B7FFF}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  header{background:#fff;padding:14px 16px 12px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:9}
+  .top{display:flex;align-items:center;justify-content:space-between}
+  h1{font-size:17px;margin:0;font-weight:750}
+  .meta{font-size:11.5px;color:var(--sub);margin-top:5px}
+  .logout{font-size:11.5px;color:var(--sub);border:1px solid var(--line);background:#fff;
+    border-radius:8px;padding:5px 9px}
+  .wrap{padding:12px}
+  .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(17,24,39,.05)}
+  .stat{display:flex;gap:10px}
+  .stat div{flex:1;text-align:center}
+  .stat b{display:block;font-size:20px;font-weight:750}
+  .stat span{font-size:11px;color:var(--sub)}
+  .prog{height:8px;background:#e9edf2;border-radius:999px;overflow:hidden;margin:12px 0 6px}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,#07C160,#5ede9c);
+    border-radius:999px;transition:width .3s}
+  .next{border:1.5px solid var(--green);background:#f4fdf8;border-radius:16px;padding:14px;
+    margin-bottom:12px}
+  .next .tagline{display:flex;justify-content:space-between;align-items:center;
+    font-size:11px;color:#06874a;font-weight:750}
+  .next h2{font-size:16px;margin:8px 0 10px}
+  .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;color:#374151}
+  .kv b{font-weight:650;text-align:right;max-width:62%}
+  .kv.money{border-top:1px dashed #cdebd8;margin-top:4px;padding-top:9px}
+  .money b{color:#c0392b;font-size:16px}
+  .ops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .ops button{border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;
+    font-family:inherit}
+  .ops .a{background:#e8f0ff;color:#1b5fd0}
+  .ops .b{background:var(--green);color:#fff}
+  .ops .c{background:#fff;border:1px solid #f5c6c4;color:#c0392b}
+  .list .it{display:flex;justify-content:space-between;align-items:center;padding:10px 0;
+    border-bottom:1px solid var(--line);font-size:12.5px}
+  .list .it:last-child{border-bottom:none}
+  .done{color:#06874a;font-weight:700;font-size:11.5px}
+  .wait{color:#b45c00;font-weight:700;font-size:11.5px}
+  h3{font-size:13px;margin:0 0 8px;font-weight:750}
+  .empty{color:#9aa2ac;font-size:12.5px;text-align:center;padding:24px 0}
+  #toast{position:fixed;left:12px;right:12px;bottom:16px;z-index:20;display:flex;
+    flex-direction:column;gap:8px}
+  .msg{background:#fff;border-left:4px solid var(--green);border-radius:10px;padding:11px 13px;
+    font-size:12.5px;line-height:1.6;box-shadow:0 8px 24px rgba(20,23,26,.14)}
+  .msg.err{border-left-color:var(--red)}
+  .msg b{display:block;margin-bottom:3px}
+  #login{position:fixed;inset:0;background:linear-gradient(160deg,#eef2f8,#dfe5ee);
+    display:none;place-items:center;padding:20px;z-index:30}
+  #login.on{display:grid}
+  .lbox{background:#fff;border-radius:18px;padding:24px;width:100%;max-width:360px;
+    box-shadow:0 20px 50px rgba(24,32,44,.18)}
+  .lbox h2{margin:0 0 4px;font-size:17px}
+  .lbox p{margin:0 0 16px;font-size:12px;color:var(--sub);line-height:1.6}
+  .lbox label{font-size:11.5px;color:var(--sub);display:block;margin:10px 0 5px}
+  .lbox input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px;
+    font-family:inherit}
+  .lbox .btn{width:100%;margin-top:16px;border:none;border-radius:12px;padding:12px;
+    background:var(--green);color:#fff;font-size:14.5px;font-weight:700;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <h2>配送</h2>
+    <p>演示账号 <code>driver1</code> / 密码 <code>demo1234</code><br>司机只看本线路的配送单，看不到价格成本。</p>
+    <label>账号</label><input id="lu" value="driver1">
+    <label>密码</label><input id="lp" type="password" value="demo1234">
+    <button class="btn" onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<header>
+  <div class="top">
+    <h1 id="h-line">线路</h1>
+    <button class="logout" onclick="logout()">退出</button>
+  </div>
+  <div class="meta" id="h-meta"></div>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <div class="stat">
+      <div><b id="s-total">0</b><span>今日单</span></div>
+      <div><b id="s-done">0</b><span>已签收</span></div>
+      <div><b id="s-amount">¥0</b><span>代收货款</span></div>
+    </div>
+    <div class="prog"><i id="prog" style="width:0%"></i></div>
+    <div style="font-size:11px;color:#6b7280" id="prog-txt">—</div>
+  </div>
+
+  <div id="next-box"></div>
+
+  <div class="card list">
+    <h3>待送 <span style="font-weight:400;color:#6b7280;font-size:11px" id="left-n"></span></h3>
+    <div id="left"></div>
+  </div>
+
+  <div class="card list">
+    <h3>已送达</h3>
+    <div id="done"></div>
+  </div>
+
+  <div class="ops" style="grid-template-columns:1fr;margin-bottom:20px">
+    <button class="c" onclick="reportIssue()">异常上报（拒收 / 少货 / 关门）</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let TOKEN = localStorage.getItem('p1.driver.token') || '';
+let ME = null, ITEMS = [];
+
+async function call(p, m = 'GET', b) {
+  const o = { method: m, headers: { 'Content-Type': 'application/json' } };
+  if (TOKEN) o.headers.Authorization = 'Bearer ' + TOKEN;
+  if (b) o.body = JSON.stringify(b);
+  const r = await fetch(p, o);
+  let j; try { j = await r.json(); } catch (e) { j = { ok: false, message: '服务异常' }; }
+  if (r.status === 401) { showLogin(); throw { message: '请重新登录' }; }
+  if (!j.ok) throw j;
+  return j;
+}
+function toast(t, d, err) {
+  const el = document.createElement('div');
+  el.className = 'msg' + (err ? ' err' : '');
+  el.innerHTML = `<b>${t}</b>` + (d && d.message ? `<div style="color:#6b7280">${d.message}</div>` : '');
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), err ? 6000 : 2600);
+}
+function showLogin() { document.getElementById('login').classList.add('on'); }
+async function doLogin() {
+  const r = await fetch('/api/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: lu.value.trim(), password: lp.value }) }).then(x => x.json());
+  if (!r.ok) return toast('登录失败', r, true);
+  TOKEN = r.token; localStorage.setItem('p1.driver.token', TOKEN); ME = r.user;
+  document.getElementById('login').classList.remove('on');
+  boot();
+}
+function logout() { localStorage.removeItem('p1.driver.token'); location.reload(); }
+
+async function boot() {
+  const me = await call('/api/auth/me'); ME = me.user;
+  document.getElementById('h-line').textContent = '线路 ' + (ME.route_code || '—');
+  document.getElementById('h-meta').textContent = `${ME.name} ｜ 车型 常温车 ｜ 只看本线路`;
+  await load();
+}
+
+async function load() {
+  const d = await call('/api/deliveries');
+  ITEMS = d.items;
+  const pending = ITEMS.filter(x => x.status === '配送中');
+  const signed = ITEMS.filter(x => x.status === '已签收');
+  const amount = pending.reduce((a, x) => a + x.amount, 0);
+  document.getElementById('s-total').textContent = ITEMS.length;
+  document.getElementById('s-done').textContent = signed.length;
+  document.getElementById('s-amount').textContent = '¥' + amount.toFixed(0);
+  const pct = ITEMS.length ? Math.round(signed.length / ITEMS.length * 100) : 0;
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-txt').textContent =
+    ITEMS.length ? `已签收 ${signed.length}/${ITEMS.length}（${pct}%）` : '今天没有配送单';
+
+  const cur = pending[0];
+  document.getElementById('next-box').innerHTML = cur ? `
+    <div class="next">
+      <div class="tagline"><span>下一站 · 第 ${signed.length + 1} 单</span>
+        <span>剩 ${pending.length} 站</span></div>
+      <h2>${cur.store}</h2>
+      <div class="kv"><span>地址</span><b>${cur.address || '—'}</b></div>
+      <div class="kv"><span>订单</span><b>${cur.order_no}（${cur.lines} 个品项）</b></div>
+      <div class="kv"><span>配送单</span><b>${cur.delivery_no}</b></div>
+      <div class="kv money"><span>代收货款</span><b>¥${cur.amount.toFixed(2)}</b></div>
+      <div class="ops">
+        <button class="a" onclick="nav()">导航前往</button>
+        <button class="b" onclick="sign('${cur.delivery_no}','${cur.store}')">到达 · 签收</button>
+      </div>
+    </div>` : `<div class="card"><div class="empty">全部送完了，可以收车</div></div>`;
+
+  document.getElementById('left-n').textContent = pending.length ? `（${pending.length} 单）` : '';
+  document.getElementById('left').innerHTML = pending.length
+    ? pending.map((x, i) => `<div class="it">
+        <div><div style="font-weight:650">${x.store}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:3px">${x.delivery_no}</div></div>
+        <div style="text-align:right"><span class="wait">${i === 0 ? '下一站' : '待送'}</span>
+          <div style="font-size:11px;color:#6b7280">¥${x.amount.toFixed(2)}</div></div>
+      </div>`).join('') : '<div class="empty">没有待送的单</div>';
+
+  document.getElementById('done').innerHTML = signed.length
+    ? signed.map(x => `<div class="it">
+        <div><div style="font-weight:650">${x.store}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:3px">签收人 ${x.receiver || '—'}</div></div>
+        <div style="text-align:right"><span class="done">已签收</span>
+          <div style="font-size:11px;color:#6b7280">${x.signed_at || ''}</div></div>
+      </div>`).join('') : '<div class="empty">还没有签收记录</div>';
+}
+
+async function sign(no, store) {
+  try {
+    const r = await call(`/api/deliveries/${no}/sign`, 'POST', { receiver: store + ' 收货人' });
+    toast('已签收', { message: `${store} ｜ 账期日 ${r.due_date}` });
+    await load();
+  } catch (e) { toast('签收失败', e, true); }
+}
+
+function nav() { toast('导航', { message: '演示环境不调起地图，生产版接高德导航' }); }
+function reportIssue() {
+  toast('异常上报', { message: '演示版未接表单；生产版要求拍照 + 选择原因 + 通知内勤' });
+}
+
+(async function init() {
+  if (!TOKEN) return showLogin();
+  try { await boot(); } catch (e) { showLogin(); }
+})();
+</script>
+</body>
+</html>

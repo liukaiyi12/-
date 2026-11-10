@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>订货 · 新平食品</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--ink:#14171a;--sub:#6b7280;--line:#e9ecf1;--bg:#f4f6f9;--green:#07C160;--red:#e5484d}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    padding-bottom:78px}
+  header{background:#fff;padding:14px 16px 12px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:9}
+  header .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  header h1{font-size:17px;margin:0;font-weight:750}
+  header .meta{font-size:11.5px;color:var(--sub);margin-top:5px;line-height:1.6}
+  .logout{font-size:11.5px;color:var(--sub);border:1px solid var(--line);background:#fff;
+    border-radius:8px;padding:5px 9px}
+  .wrap{padding:12px 12px 0}
+  .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(17,24,39,.05)}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .goods{display:flex;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+  .goods:last-child{border-bottom:none}
+  .thumb{width:48px;height:48px;border-radius:11px;flex:0 0 48px;display:grid;place-items:center;
+    font-size:10px;font-weight:700;color:#7a5410;text-align:center;line-height:1.2;padding:2px}
+  .t0{background:linear-gradient(160deg,#ffe3b0,#ffc978)}
+  .t1{background:linear-gradient(160deg,#ffd0d0,#ffa7a7)}
+  .t2{background:linear-gradient(160deg,#d6e4ff,#a9c6ff)}
+  .t3{background:linear-gradient(160deg,#d8f5e3,#a6e3c1)}
+  .nm{font-size:13.5px;font-weight:650}
+  .sp{font-size:11px;color:var(--sub);margin-top:3px}
+  .pr{font-size:14px;font-weight:750;color:#c0392b;margin-top:4px}
+  .stp{display:flex;align-items:center;gap:9px}
+  .stp b{width:28px;height:28px;border-radius:50%;background:#f2f4f7;display:grid;place-items:center;
+    font-size:16px;font-weight:700;color:#5b636e;user-select:none}
+  .stp .n{min-width:16px;text-align:center;font-weight:700}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+    padding:11px 14px 14px;display:flex;gap:10px;align-items:center;z-index:10}
+  .bar .amt{flex:1;font-size:12px;color:var(--sub)}
+  .bar .amt b{display:block;font-size:19px;color:#c0392b;margin-top:2px}
+  .btn{border:none;border-radius:12px;padding:12px 18px;font-size:14.5px;font-weight:700;
+    font-family:inherit;background:var(--green);color:#fff}
+  .btn:disabled{background:#cfd6de;color:#fff}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .tabs{display:flex;gap:6px;padding:10px 12px 0}
+  .tabs button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;
+    font-size:13px;font-family:inherit;color:#4b5563}
+  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .ord{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);
+    font-size:12.5px;align-items:center}
+  .ord:last-child{border-bottom:none}
+  .badge{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#eef4ff;color:#1b5fd0;font-weight:700}
+  .badge.g{background:#e6f7ee;color:#06874a}
+  .badge.o{background:#fff1e3;color:#b45c00}
+  .empty{color:#9aa2ac;font-size:12.5px;text-align:center;padding:26px 0}
+  #toast{position:fixed;left:12px;right:12px;bottom:88px;z-index:20;display:flex;flex-direction:column;gap:8px}
+  .msg{background:#fff;border-left:4px solid var(--green);border-radius:10px;padding:11px 13px;
+    font-size:12.5px;line-height:1.6;box-shadow:0 8px 24px rgba(20,23,26,.14)}
+  .msg.err{border-left-color:var(--red)}
+  .msg b{display:block;margin-bottom:3px}
+  #login{position:fixed;inset:0;background:linear-gradient(160deg,#eef2f8,#dfe5ee);
+    display:none;place-items:center;padding:20px;z-index:30}
+  #login.on{display:grid}
+  .lbox{background:#fff;border-radius:18px;padding:24px;width:100%;max-width:360px;
+    box-shadow:0 20px 50px rgba(24,32,44,.18)}
+  .lbox h2{margin:0 0 4px;font-size:17px}
+  .lbox p{margin:0 0 16px;font-size:12px;color:var(--sub);line-height:1.6}
+  .lbox label{font-size:11.5px;color:var(--sub);display:block;margin:10px 0 5px}
+  .lbox input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px;
+    font-family:inherit}
+  .lbox .btn{width:100%;margin-top:16px}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <h2>门店订货</h2>
+    <p>演示账号 <code>store1</code> / 密码 <code>demo1234</code><br>门店账号只能看到自己的价格、订单和账。</p>
+    <label>账号</label><input id="lu" value="store1">
+    <label>密码</label><input id="lp" type="password" value="demo1234">
+    <button class="btn" onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<header>
+  <div class="top">
+    <h1 id="h-name">—</h1>
+    <button class="logout" onclick="logout()">退出</button>
+  </div>
+  <div class="meta" id="h-meta"></div>
+</header>
+
+<div class="tabs">
+  <button class="on" data-t="o">订货</button>
+  <button data-t="l">我的订单</button>
+  <button data-t="r">对账</button>
+</div>
+
+<div class="wrap">
+  <div id="p-o">
+    <div class="card">
+      <div class="row" style="margin-bottom:4px">
+        <span style="font-size:13px;font-weight:750">常购清单</span>
+        <span style="font-size:11px;color:#6b7280">按箱订</span>
+      </div>
+      <div id="goods"></div>
+    </div>
+  </div>
+  <div id="p-l" style="display:none">
+    <div class="card"><div id="orders"></div></div>
+  </div>
+  <div id="p-r" style="display:none">
+    <div class="card"><div id="ars"></div></div>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="amt">合计 <span id="sum-carton">0</span> 箱<b id="sum-amt">¥0.00</b></div>
+  <button class="btn" id="submit" onclick="submitOrder()">提交订单</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let TOKEN = localStorage.getItem('p1.store.token') || '';
+let ME = null, SKUS = [], CART = {}, STORE = null;
+const FAM = { '烤鱼': 't0', '火锅底料': 't1', '汤底': 't2', '炒烧酱': 't3',
+  '红油辣油': 't1', '小吃面点': 't0' };
+
+async function call(p, m = 'GET', b) {
+  const o = { method: m, headers: { 'Content-Type': 'application/json' } };
+  if (TOKEN) o.headers.Authorization = 'Bearer ' + TOKEN;
+  if (b) o.body = JSON.stringify(b);
+  const r = await fetch(p, o);
+  let j; try { j = await r.json(); } catch (e) { j = { ok: false, message: '服务异常' }; }
+  if (r.status === 401) { showLogin(); throw { message: '请重新登录' }; }
+  if (!j.ok) throw j;
+  return j;
+}
+function toast(t, d, err) {
+  const el = document.createElement('div');
+  el.className = 'msg' + (err ? ' err' : '');
+  let extra = '';
+  if (d && d.missing && d.missing.length)
+    extra = d.missing.map(m => `<div>缺 <b>${m.name}</b> → ${m.hint}</div>`).join('');
+  if (d && d.message) extra += `<div style="color:#6b7280">${d.message}</div>`;
+  el.innerHTML = `<b>${t}</b>${extra}`;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), err ? 6000 : 2600);
+}
+function showLogin() { document.getElementById('login').classList.add('on'); }
+async function doLogin() {
+  const r = await fetch('/api/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: lu.value.trim(), password: lp.value }) }).then(x => x.json());
+  if (!r.ok) return toast('登录失败', r, true);
+  TOKEN = r.token; localStorage.setItem('p1.store.token', TOKEN); ME = r.user;
+  document.getElementById('login').classList.remove('on');
+  boot();
+}
+function logout() { localStorage.removeItem('p1.store.token'); location.reload(); }
+
+async function boot() {
+  const me = await call('/api/auth/me'); ME = me.user;
+  const st = await call('/api/stores');
+  STORE = st.items[0] || {};
+  document.getElementById('h-name').textContent = STORE.name || ME.name;
+  document.getElementById('h-meta').textContent =
+    `${STORE.region || ''} ｜ 账期 ${STORE.settle} ｜ 额度 ¥${(STORE.credit_limit || 0).toFixed(0)}`;
+  const sk = await call('/api/master/skus');
+  SKUS = sk.items.filter(x => x.can_order);
+  renderGoods(); renderCart(); loadOrders(); loadAr();
+}
+
+function renderGoods() {
+  const box = document.getElementById('goods');
+  if (!SKUS.length) { box.innerHTML = '<div class="empty">还没有可订的商品（工厂尚未补充箱规与价格）</div>'; return; }
+  box.innerHTML = SKUS.slice(0, 12).map(s => {
+    const cls = FAM[s.category] || 't0';
+    const n = CART[s.sku_code] || 0;
+    return `<div class="goods">
+      <div class="thumb ${cls}">${s.name.slice(0, 3)}</div>
+      <div style="flex:1">
+        <div class="nm">${s.name}</div>
+        <div class="sp">${s.units_per_carton} 袋/箱 · 保质期 ${s.shelf_life_month} 个月</div>
+        <div class="pr">¥${(s.price).toFixed(2)} <span style="font-size:10.5px;color:#9aa2ac;font-weight:500">/箱</span></div>
+      </div>
+      <div class="stp">
+        <b onclick="step('${s.sku_code}',-1)">−</b><span class="n" style="min-width:16px;text-align:center">${n}</span>
+        <b onclick="step('${s.sku_code}',1)">+</b>
+      </div></div>`;
+  }).join('');
+}
+
+function step(code, d) {
+  const s = SKUS.find(x => x.sku_code === code);
+  const n = (CART[code] || 0) + d;
+  if (n <= 0) delete CART[code]; else CART[code] = n;
+  renderGoods(); renderCart();
+}
+
+function renderCart() {
+  let cartons = 0, amt = 0;
+  for (const k in CART) {
+    const s = SKUS.find(x => x.sku_code === k);
+    cartons += CART[k]; amt += CART[k] * s.price;
+  }
+  document.getElementById('sum-carton').textContent = cartons;
+  document.getElementById('sum-amt').textContent = '¥' + amt.toFixed(2);
+  document.getElementById('submit').disabled = cartons === 0;
+}
+
+async function submitOrder() {
+  const lines = Object.keys(CART).map(k => ({ sku_code: k, cartons: CART[k] }));
+  if (!lines.length) return;
+  try {
+    const r = await call('/api/orders', 'POST', { store_id: ME.store_id, lines });
+    toast('下单成功 ' + r.order_no, { message: `¥${r.amount.toFixed(2)}，等待工厂确认` });
+    CART = {}; renderGoods(); renderCart(); loadOrders();
+  } catch (e) { toast('下单未通过', e, true); }
+}
+
+async function loadOrders() {
+  const d = await call('/api/orders');
+  const box = document.getElementById('orders');
+  if (!d.items.length) { box.innerHTML = '<div class="empty">还没有订单</div>'; return; }
+  box.innerHTML = d.items.map(o => `<div class="ord">
+    <div><div style="font-weight:650">${o.order_no}</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:3px">${o.lines} 个品项 · ¥${o.amount.toFixed(2)}</div></div>
+    <span class="badge ${o.status === '已回单' ? 'g' : o.status.includes('配送') ? 'o' : ''}">${o.status}</span>
+  </div>`).join('');
+}
+
+async function loadAr() {
+  const d = await call('/api/receivables');
+  const box = document.getElementById('ars');
+  if (!d.items.length) { box.innerHTML = '<div class="empty">没有待结账的账单</div>'; return; }
+  box.innerHTML = d.items.map(r => `<div class="ord">
+    <div><div style="font-weight:650">${r.order_no}</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:3px">账期日 ${r.due_date || '—'}</div></div>
+    <div style="text-align:right"><div style="font-weight:750">¥${r.amount.toFixed(2)}</div>
+      <div style="font-size:11px;color:#6b7280">${r.status}</div></div>
+  </div>`).join('');
+}
+
+document.querySelector('.tabs').addEventListener('click', e => {
+  const t = e.target.dataset.t; if (!t) return;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  ['o', 'l', 'r'].forEach(k => document.getElementById('p-' + k).style.display = k === t ? '' : 'none');
+});
+
+(async function init() {
+  if (!TOKEN) return showLogin();
+  try { await boot(); } catch (e) { showLogin(); }
+})();
+</script>
+</body>
+</html>
