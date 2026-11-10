@@ -1,4 +1,3 @@
-const app = getApp();
 const api = require('../../utils/api');
 
 Page({
@@ -11,7 +10,7 @@ Page({
   },
 
   onLoad() {
-    const u = app.globalData.user;
+    const u = getApp().globalData.user;
     if (!u) return wx.reLaunch({ url: '/pages/login/index' });
     this.setData({ user: u, hasCost: !!u.see_cost });
   },
@@ -44,7 +43,7 @@ Page({
   },
 
   logout() {
-    app.clearLogin();
+    getApp().clearLogin();
     wx.reLaunch({ url: '/pages/login/index' });
   }
 });

@@ -1,4 +1,3 @@
-const app = getApp();
 const api = require('../../utils/api');
 
 Page({
@@ -10,7 +9,7 @@ Page({
   },
 
   onShow() {
-    if (!app.globalData.token) return wx.reLaunch({ url: '/pages/login/index' });
+    if (!getApp().globalData.token) return wx.reLaunch({ url: '/pages/login/index' });
     this.load();
   },
 

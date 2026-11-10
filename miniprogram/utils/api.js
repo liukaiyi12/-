@@ -1,17 +1,16 @@
-const app = getApp();
 
 function request(path, method = 'GET', data) {
   return new Promise((resolve, reject) => {
     const header = { 'content-type': 'application/json' };
-    if (app.globalData.token) header.Authorization = 'Bearer ' + app.globalData.token;
+    if (getApp().globalData.token) header.Authorization = 'Bearer ' + getApp().globalData.token;
     wx.request({
-      url: app.globalData.base + path,
+      url: getApp().globalData.base + path,
       method: method,
       data: data || {},
       header: header,
       success(res) {
         if (res.statusCode === 401) {
-          app.clearLogin();
+          getApp().clearLogin();
           wx.reLaunch({ url: '/pages/login/index' });
           return reject({ message: '登录已过期' });
         }

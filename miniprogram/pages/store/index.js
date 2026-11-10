@@ -1,4 +1,3 @@
-const app = getApp();
 const api = require('../../utils/api');
 
 Page({
@@ -13,7 +12,7 @@ Page({
   },
 
   onLoad() {
-    const u = app.globalData.user;
+    const u = getApp().globalData.user;
     if (!u) return wx.reLaunch({ url: '/pages/login/index' });
     this.setData({ user: u });
   },
@@ -90,7 +89,7 @@ Page({
   goOrders() { wx.navigateTo({ url: '/pages/orders/index' }); },
 
   logout() {
-    app.clearLogin();
+    getApp().clearLogin();
     wx.reLaunch({ url: '/pages/login/index' });
   }
 });

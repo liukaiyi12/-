@@ -9,6 +9,8 @@
       {{loading ? '登录中…' : '登录'}}
     </button>
     <view class="muted tip">演示账号密码都是 demo1234，点下面任意一个直接进</view>
+    <view wx:if="{{errText}}" style="margin-top:20rpx;padding:20rpx;background:#fdecec;border-radius:12rpx;
+          color:#c0392b;font-size:24rpx;line-height:1.6;white-space:pre-wrap">{{errText}}</view>
     <view class="roles">
       <view class="role" wx:for="{{roles}}" wx:key="u"
             data-u="{{item.u}}" bindtap="quick">

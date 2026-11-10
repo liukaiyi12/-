@@ -1,0 +1,14 @@
+<view style="padding:80rpx 40rpx">
+  <view style="font-size:72rpx;font-weight:700;letter-spacing:4rpx">PONG</view>
+
+  <view style="margin-top:28rpx;font-size:26rpx;color:#666;line-height:1.7">
+    看到这两个字样，说明小程序环境正常，问题在登录页。
+  </view>
+
+  <view wx:for="{{lines}}" wx:key="*this" style="margin-top:18rpx;font-size:24rpx;color:#333">
+    · {{item}}
+  </view>
+
+  <button style="margin-top:60rpx;background:#07C160;color:#fff;border-radius:16rpx"
+          bindtap="goLogin">进入登录页</button>
+</view>

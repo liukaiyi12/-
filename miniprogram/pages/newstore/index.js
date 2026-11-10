@@ -1,4 +1,3 @@
-const app = getApp();
 const api = require('../../utils/api');
 
 Page({
