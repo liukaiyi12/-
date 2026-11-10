@@ -24,7 +24,10 @@ from datetime import date, datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-from openpyxl import load_workbook
+try:
+    from openpyxl import load_workbook
+except ImportError:          # 容器里 pip 装不上时也别让服务起不来
+    load_workbook = None
 
 import p1_auth as A
 import p1_schedule as SCH
@@ -44,6 +47,7 @@ DB = os.path.join(DATA, "p1.db")
 UPLOADS = os.path.join(DATA, "uploads")
 os.makedirs(UPLOADS, exist_ok=True)
 XLSX = os.environ.get("P1_XLSX") or os.path.join(BASE, "02_商品主数据表_v1.xlsx")
+CATALOG_JSON = os.path.join(BASE, "catalog.json")
 WEB = os.path.join(BASE, "p1_web")
 TODAY = date.today()
 SECRET = A.secret(os.path.join(DATA, ".secret"))
@@ -221,6 +225,47 @@ def haversine(lat1, lng1, lat2, lng2):
     return 2 * r * math.asin(min(1.0, math.sqrt(a)))
 
 
+def load_catalog():
+    """读商品目录。顺序：xlsx → catalog.json → 空。
+    返回 (有品名的 SKU 列表, {品类名: (品类码, 典型客户)})。"""
+    # 1) xlsx
+    if load_workbook is not None and os.path.exists(XLSX):
+        try:
+            wb = load_workbook(XLSX, data_only=True)
+            ws = wb["01 商品主数据"]
+            wsd = wb["02 品类字典"]
+            cats = {}
+            for i in range(3, wsd.max_row + 1):
+                code, name, cli = wsd.cell(i, 1).value, wsd.cell(i, 2).value, wsd.cell(i, 5).value
+                if code and name and len(str(code)) == 2:
+                    cats[name] = (code, cli)
+            rows, r = [], 3
+            while ws.cell(r, 1).value:
+                rows.append({
+                    "code": ws.cell(r, 1).value, "cat": ws.cell(r, 2).value,
+                    "name": ws.cell(r, 3).value, "spu": ws.cell(r, 5).value,
+                    "net": ws.cell(r, 6).value, "pack": ws.cell(r, 7).value})
+                r += 1
+            print("[p1] 商品目录：从 xlsx 读取 %d 条" % len(rows))
+            return rows, cats
+        except Exception as e:
+            print("[p1] xlsx 读取失败（%s），改用 JSON 快照" % e)
+
+    # 2) JSON 快照
+    if os.path.exists(CATALOG_JSON):
+        try:
+            data = json.load(open(CATALOG_JSON, encoding="utf-8"))
+            cats = {c["name"]: (c["code"], c.get("client")) for c in data["categories"]}
+            rows = data["skus"]
+            print("[p1] 商品目录：从 catalog.json 读取 %d 条" % len(rows))
+            return rows, cats
+        except Exception as e:
+            print("[p1] catalog.json 读取失败：%s" % e)
+
+    print("[p1] 警告：没有可用的商品目录，SKU 表将是空的")
+    return [], {}
+
+
 def seed(c):
     for rid, pid, name, path in REGIONS:
         c.execute("INSERT OR IGNORE INTO region VALUES (?,?,?,?)", (rid, pid, name, path))
@@ -231,29 +276,23 @@ def seed(c):
                      VALUES (?,?,?,?,?,?,?,?,?,1)""",
                   (uid, uid, salt, hpw, uname, role, region, store_id, route))
 
-    wb = load_workbook(XLSX, data_only=True)
-    ws = wb["01 商品主数据"]
-    wsd = wb["02 品类字典"]
-    cats = {}
-    for i in range(3, wsd.max_row + 1):
-        code, name, cli = wsd.cell(i, 1).value, wsd.cell(i, 2).value, wsd.cell(i, 5).value
-        if code and name and len(str(code)) == 2:
-            cats[name] = (code, cli)
-
-    r = 3
-    while ws.cell(r, 1).value:
-        code, cat, name = ws.cell(r, 1).value, ws.cell(r, 2).value, ws.cell(r, 3).value
-        spu, net, pack = ws.cell(r, 5).value, ws.cell(r, 6).value, ws.cell(r, 7).value
-        ccode, cli = cats.get(cat, ("XX", None))
-        c.execute("INSERT OR IGNORE INTO category VALUES (?,?,?)", (ccode, cat, cli))
-        c.execute("INSERT OR IGNORE INTO spu VALUES (?,?,?,?)", (spu, spu, ccode, name))
+    # 商品目录：优先读 xlsx，读不到就退回仓库里的 JSON 快照。
+    # 这样即使容器里装不上 openpyxl，服务照样能起来（否则 import 失败 → 进程退出 → 端口没人监听）。
+    rows, cats = load_catalog()
+    for cat_name, (ccode, cli) in cats.items():
+        c.execute("INSERT OR IGNORE INTO category VALUES (?,?,?)", (ccode, cat_name, cli))
+    for it in rows:
+        cat_name = it["cat"]
+        ccode, cli = cats.get(cat_name, ("XX", None))
+        c.execute("INSERT OR IGNORE INTO category VALUES (?,?,?)", (ccode, cat_name, cli))
+        c.execute("INSERT OR IGNORE INTO spu VALUES (?,?,?,?)",
+                  (it["spu"], it["spu"], ccode, it["name"]))
         c.execute(
             """INSERT OR IGNORE INTO sku(id, sku_code, spu_id, name, category, net_weight_g,
                  pack_type, units_per_carton, shelf_life_month, storage_cond, price_cent, cost_cent,
                  ingredient_text, sc_no, std_code, moq_carton, status)
                VALUES (?,?,?,?,?,?,?,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'在产')""",
-            (code, code, spu, name, cat, net, pack))
-        r += 1
+            (it["code"], it["code"], it["spu"], it["name"], cat_name, it["net"], it["pack"]))
 
     for sid, sname, settle, limit, owner, addr, region, route, lng, lat in STORES:
         c.execute("""INSERT OR IGNORE INTO store
